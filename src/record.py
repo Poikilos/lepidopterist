@@ -25,6 +25,7 @@ def getstate():
 def setstate(state):
     global heightrecord, comborecord, collected, bank, hiscore, unlocked, maxvisited, seentips
     heightrecord, comborecord, collected, bank, hiscore, unlocked, maxvisited, seentips = state
+    unlocked = min(unlocked, 6)
 
 def checkheightrecord(h):
     global heightrecord, newheightrecord, bonusamount

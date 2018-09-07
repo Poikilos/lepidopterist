@@ -10,7 +10,8 @@ cheat = "--cheat" in sys.argv
 unlockall = "--unlockall" in sys.argv
 alwaysshow = "--alwaysshow" in sys.argv  # Repeat cutscenes
 hidefeatnames = "--hidefeatnames" in sys.argv
-easy = False  # Easy mode
+fullscreen = "--fullscreen" in sys.argv
+easy = "--easy" in sys.argv
 
 savefile = "savegame"
 for arg in sys.argv:

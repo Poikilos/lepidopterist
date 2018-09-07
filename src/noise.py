@@ -38,10 +38,13 @@ def play(name):
     elif name in songs:
         if settings.nomusic: return
         pygame.mixer.music.load(songs[name])
-        pygame.mixer.music.play()
+        pygame.mixer.music.play(-1)
 
 def stop():
     if settings.nomusic: return
     pygame.mixer.music.stop()
+
+pause = pygame.mixer.music.pause
+unpause = pygame.mixer.music.unpause
 
 

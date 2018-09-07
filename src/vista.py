@@ -1,6 +1,6 @@
 # Controls the gameplay area and also the screen
 
-import pygame
+import pygame, os
 from pygame import *
 import data, settings, loadlevel
 
@@ -10,14 +10,19 @@ backdrops = {}
 def init():
     global screen, sx, sy
     sx, sy = settings.resolution
-    screen = pygame.display.set_mode((sx, sy))
+    flags = pygame.FULLSCREEN if settings.fullscreen else 0
+    screen = pygame.display.set_mode((sx, sy), flags)
     pygame.display.set_caption("Mortimer the Lepidopterist")
-#    pygame.mouse.set_visible(0)
+    pygame.mouse.set_visible(not settings.fullscreen)
 
 def makegrass(level):
     global backdrops, backdrop
     if level in backdrops:
         backdrop = backdrops[level]
+        return
+    backdropfile = data.filepath("backdrop-%s.png" % level)
+    if os.path.exists(backdropfile):
+        backdrop = backdrops[level] = pygame.image.load(backdropfile).convert_alpha()
         return
     if level == 1:
         image0 = pygame.image.load(data.filepath("grassdead0001.jpg")).convert_alpha()
@@ -45,20 +50,30 @@ def makegrass(level):
         bcolor = 192, 92, 128
     else:
         image0 = pygame.image.load(level).convert_alpha()
-    w, h = image0.get_size()
-    yf = int(h/2)
-    for x in range(w):
-        for y in range(yf):
-            r,g,b,a = image0.get_at((x,y))
-            image0.set_at((x,y), (r,g,b,int(255*y/yf)))
-    grass = pygame.transform.scale(image0, (vx1-vx0,200))
+    w0, h0 = image0.get_size()
+    yf0 = int(h0/2)
+    w1, h1 = image1.get_size()
+    yf1 = int(150 * h1 / (vy1-vy0-300))
 
-    w, h = image1.get_size()
-    yf = int(150 * h / (vy1-vy0-300))
-    for x in range(w):
-        for y in range(yf):
-            r,g,b,a = image1.get_at((x,h-y-1))
-            image1.set_at((x,h-y-1), (r,g,b,int(255*y/yf)))
+    try:
+        array0 = pygame.surfarray.pixels_alpha(image0)
+        array1 = pygame.surfarray.pixels_alpha(image1)
+        for y in range(yf0):
+            array0[:,y] = int(255*y/yf0)
+        for y in range(yf1):
+            array1[:,h1-y-1] = int(255*y/yf1)
+        del array0, array1
+    except ImportError:  # No surfarray
+        for x in range(w0):
+            for y in range(yf0):
+                r,g,b,a = image0.get_at((x,y))
+                image0.set_at((x,y), (r,g,b,int(255*y/yf0)))
+        for x in range(w1):
+            for y in range(yf1):
+                r,g,b,a = image1.get_at((x,h1-y-1))
+                image1.set_at((x,h1-y-1), (r,g,b,int(255*y/yf1)))
+
+    grass = pygame.transform.scale(image0, (vx1-vx0,200))
     sky = pygame.transform.scale(image1, (vx1-vx0,(vy1-vy0-300)))
     
     backdrop = pygame.Surface((vx1-vx0,vy1-vy0)).convert_alpha()
@@ -66,6 +81,7 @@ def makegrass(level):
     backdrop.blit(sky,(0,0))
     backdrop.blit(grass,(0,vy1-vy0-200))
     backdrops[level] = backdrop
+    pygame.image.save(backdrop, backdropfile)
 
 def levelinit(level):
     global vx0, vx1, vy0, vy1

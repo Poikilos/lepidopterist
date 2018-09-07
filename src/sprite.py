@@ -149,9 +149,9 @@ class GreyButterfly(Butterfly):
     name = "greybutterfly"
     fullname = "Two Ply Moth"
     fnames = ("grey0", "grey1")
-    ymin, ymax = 100, 600
+    ymin, ymax = 220, 600
     vx0, vy0 = 40, 400
-    value = 8
+    value = 6
 
 class PurpleButterfly(Butterfly):
     name = "pbutterfly"
@@ -173,7 +173,7 @@ class BlueFairy(Butterfly):
     fnames = ("fairy-blue",)
     ymin, ymax = 300, 500
     name = "bfairy"
-    fullname = "Annoying Kokiri Fairy"
+    fullname = "Strident Kokiri Fairy"
     value = 8
     vx0, vy0 = 600, 200
     flighttime = 0.2

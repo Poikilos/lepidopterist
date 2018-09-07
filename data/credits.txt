@@ -1,0 +1,8 @@
+Mortimer the Lepidopterist
+Written for the|Pyweek game programming challenge|http://pyweek.org
+Game concept, code, and drawings|by Christopher Night
+Backgrounds copyright:|http://cgtextures.com
+Fonts from fontspace.com:|Merkin by Apostrophic Labs|Kool Beans by Insanitype|Quigley Wiggly by Nick's Fonts|Fighting Spirit by Teabeer Studios|SF Arch Rival by ShyFoundry
+Music from ccmixter.org:|The Annual New England Xylophone|Symposium by DoKashiteru|Another Girl (Instrumental) by duckett|One Five Nine (SR Mix) by IamTheStev
+Music from chadcrouch.bandcamp.com:|Gnosseinne 1 by Erik Satie|arranged by Chad Crouch
+Sound effects from freesound.org:|Till with Bell by Benboncan|Swoosh by qubodup|Additional sound effects from:|http://www.allmusiclibrary.com

@@ -14,14 +14,16 @@ RUNNING THE GAME: python run_game.py
 CONTROLS:
 
 Arrow keys + space bar
-Esc to quit
-Tab to shrink the heads-up display
+Esc: quit
+Tab: shrink the heads-up display
+F: switch between fullscreen and window mode
 
 Follow the in-game tips.
 
-If the game is too hard, enter this cheat code on the stage select screen:
-up up down down up up down down
-
+Cheat codes (enter on the stage select screen):
+up up down down up up down down - activate easy mode
+up down down down down up up up - watch all cut scenes and credits
+up down up up down up down down - delete the saved game and quit
 
 HOW TO PLAY:
 
@@ -34,10 +36,12 @@ HOW TO PLAY:
 COMMAND-LINE OPTIONS:
 --nosound: disable sound effects
 --nomusic: disable music
---savegame=NAME: use the specified save game instead of the default
---restart: start the game over
+--fullscreen: start game in fullscreen mode
+--savefile=NAME: use the specified save game instead of the default (savegame)
+--restart: delete the saved game before starting
 --alwaysshow: repeat cutscenes even if you've already seen them
-
+--cheat: start with all abilities unlocked and maxed out
+--easy: activate easy mode
 
 LICENSE:
 
@@ -61,6 +65,8 @@ Fighting Spirit is freeware for non-commercial use, by Teabeer Studios:
 http://www.fontspace.com/teabeer-studios/fighting-spirit-tbs
 SF Arch Rival is freeware for non-commercial use, by ShyFoundry:
 http://www.fontspace.com/shyfoundry/sf-arch-rival
+freesansbold is distributed with pygame, available under Gnu LGPL:
+http://www.pygame.org
 
 MUSIC is licensed as follows:
 The Annual New England Xylophone Symposium is CC-BY by DoKashiteru:

@@ -1,4 +1,4 @@
-import pygame, math, random
+import pygame, math, random, sys
 from pygame.locals import *
 import data, combo, effect, vista, feat, sprite, settings, record, loadlevel, noise, game
 
@@ -12,11 +12,12 @@ def main():
     noise.init()
     sprite.load()
     level = record.unlocked
+    if record.maxvisited:
+        noise.play("girl")
     while True:
         if record.maxvisited:
-            noise.play("girl")
             worldmap()
-            noise.stop()
+#            noise.stop()
         if level in (1,4):
             noise.play("gnos")
         if level in (2,5):
@@ -27,18 +28,18 @@ def main():
         record.visit(level)
         showtip()
         action()
+        record.combinemoney()
         game.save()
-        effect.savecache()
         if record.unlocked > 6:  # Ending sequence
             level = 7
             cutscene()
-            record.unlocked = 6
             level = 6
             game.save()
+            rollcredits()
             theend()
+        noise.play("girl")
         shop()
         game.save()
-        noise.stop()
 
 def worldmap():
     global level
@@ -59,7 +60,7 @@ def worldmap():
     hceffect.position(vista.screen)
     updateteffect = True
     udseq = []
-    esign = None
+    esign, rsign = None, None
     while True:
         dt = clock.tick(60) * 0.001
         if settings.printfps and random.random() < dt:
@@ -67,9 +68,9 @@ def worldmap():
 
         for event in pygame.event.get():
             if event.type == QUIT:
-                exit()
+                sys.exit()
             elif event.type == KEYDOWN and event.key == K_ESCAPE:
-                exit()
+                sys.exit()
             elif event.type == KEYDOWN and event.key == K_F12:
                 pygame.image.save(vista.screen, "screenshot.png")
             elif event.type == KEYDOWN and event.key == K_RIGHT:
@@ -84,25 +85,53 @@ def worldmap():
                     updateteffect = True
             elif event.type == KEYDOWN and event.key in (K_UP, K_DOWN):
                 udseq.append(0 if event.key == K_UP else 1)
+                # Activate Easy Mode
                 if len(udseq) >= 8 and tuple(udseq[-8:]) == (0,0,1,1,0,0,1,1) and not settings.easy:
                     settings.easy = True
                     esign = effect.EasyModeIndicator(["Easy Mode Activated!"])
                     esign.position(vista.screen)
                     udseq = []
                     noise.play("cha-ching")
+                # Display all cut scenes
+                if len(udseq) >= 8 and tuple(udseq[-8:]) == (0,1,1,1,1,0,0,0):
+                    settings.alwaysshow = True
+                    for level in (1,2,3,4,5,6,7):
+                        if level in (1,4):
+                            noise.play("gnos")
+                        if level in (2,5):
+                            noise.play("one")
+                        if level in (3,6):
+                            noise.play("xylo")
+                        cutscene()
+                    rollcredits()
+                    theend()
+                # Delete the saved game
+                if len(udseq) >= 8 and tuple(udseq[-8:]) == (0,1,0,0,1,0,1,1):
+                    game.remove()
+                    rsign = effect.EasyModeIndicator(["Save game deleted!"])
+                    rsign.position(vista.screen)
+                    udseq = []
+                    noise.play("cha-ching")
             elif event.type == KEYDOWN and event.key == K_SPACE:
                 return
+            elif event.type == KEYDOWN and event.key == K_f:
+                settings.fullscreen = not settings.fullscreen
+                vista.init()
 
         if updateteffect:
             teffect.update(levelnames[level-1])
             teffect.position(vista.screen)
             updateteffect = False
 
-        hstext = u"high score: \u00A3%s" % record.hiscore[level] if level in record.hiscore else ""
+        hstext = "high score: LLL%s" % record.hiscore[level] if level in record.hiscore else ""
         hseffect.update(hstext)
         hseffect.position(vista.screen)
         if esign:
             esign.think(dt)
+        if rsign:
+            rsign.think(dt)
+            if not rsign:
+                sys.exit()
 
         vista.mapclear()
         for j in range(1,record.unlocked):
@@ -118,6 +147,8 @@ def worldmap():
         hceffect.draw(vista.screen)
         if esign:
             esign.draw(vista.screen)
+        if rsign:
+            rsign.draw(vista.screen)
         pygame.display.flip()
 
 def cutscene():
@@ -144,23 +175,29 @@ def cutscene():
             color = r,128+r,r
         pygame.draw.line(background, color,(0,y),(9999,y))
     speaker = None
+    dticker = 0
     while dlines or dialogue:
         dt = clock.tick(60) * 0.001
+        dticker += dt
         if settings.printfps and random.random() < dt:
             print clock.get_fps()
 
         for event in pygame.event.get():
             if event.type == QUIT:
-                exit()
+                sys.exit()
             elif event.type == KEYDOWN and event.key == K_ESCAPE:
                 return
-            elif event.type == KEYDOWN and event.key == K_SPACE:
+            elif event.type == KEYDOWN and event.key == K_SPACE and dticker > 0.4:
                 dialogue = None
             elif event.type == KEYDOWN and event.key == K_F12:
                 pygame.image.save(vista.screen, "screenshot.png")
+            elif event.type == KEYDOWN and event.key == K_f:
+                settings.fullscreen = not settings.fullscreen
+                vista.init()
 
         if not dialogue:
             if not dlines: return
+            dticker = 10. if dialogue is None else 0
             newspeaker, _, line = dlines[0].partition("|")
             dialogue = effect.Dialogue(line, newspeaker)
             if newspeaker != speaker:
@@ -194,13 +231,16 @@ def showtip():
 
         for event in pygame.event.get():
             if event.type == QUIT:
-                exit()
+                sys.exit()
             elif event.type == KEYDOWN and event.key in (K_ESCAPE, K_SPACE):
                 vista.screen.fill((0,0,0))
                 pygame.display.flip()
                 return
             elif event.type == KEYDOWN and event.key == K_F12:
                 pygame.image.save(vista.screen, "screenshot.png")
+            elif event.type == KEYDOWN and event.key == K_f:
+                settings.fullscreen = not settings.fullscreen
+                vista.init()
 
         tip.think(dt)
 
@@ -210,8 +250,6 @@ def showtip():
         if not tip: return
 
 def shop():
-    # TODO: show species collected
-    record.combinemoney()
     vista.mapinit()
     feat.startlevel()
     clock = pygame.time.Clock()
@@ -235,11 +273,14 @@ def shop():
 
         for event in pygame.event.get():
             if event.type == QUIT:
-                exit()
+                sys.exit()
             elif event.type == KEYDOWN and event.key == K_ESCAPE:
                 return
             elif event.type == KEYDOWN and event.key == K_F12:
                 pygame.image.save(vista.screen, "screenshot.png")
+            elif event.type == KEYDOWN and event.key == K_f:
+                settings.fullscreen = not settings.fullscreen
+                vista.init()
             elif event.type == KEYDOWN and event.key == K_UP:
                 pointer -= 1
                 pointer %= nfeat
@@ -270,12 +311,42 @@ def shop():
         for tag in pricetags: tag.draw(vista.screen)
         pygame.display.flip()
 
+def rollcredits():
+    clines = open(data.filepath("credits.txt")).readlines()
+    credit = effect.Credit(clines)
+    clock = pygame.time.Clock()
+    while credit:
+
+        dt = clock.tick(60) * 0.001
+        if settings.printfps and random.random() < dt:
+            print clock.get_fps()
+
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                sys.exit()
+            elif event.type == KEYDOWN and event.key == K_ESCAPE:
+                return
+            elif event.type == KEYDOWN and event.key == K_SPACE:
+                credit.advance()
+            elif event.type == KEYDOWN and event.key == K_F12:
+                pygame.image.save(vista.screen, "screenshot.png")
+            elif event.type == KEYDOWN and event.key == K_f:
+                settings.fullscreen = not settings.fullscreen
+                vista.init()
+
+        credit.think(dt)
+
+        vista.screen.fill((0,0,0))
+        credit.draw(vista.screen)
+        pygame.display.flip()
+
+
 def theend():
     clock = pygame.time.Clock()
     pygame.event.get()
     endthing = effect.Effect(["THE END"])
     total = sum(record.hiscore.values())
-    hsthing = effect.HighScoreTotal([u"High score total: \u00A3%s" % total])
+    hsthing = effect.HighScoreTotal(["High score total: LLL%s" % total])
     endthing.position(vista.screen)
     hsthing.position(vista.screen)
     while True:
@@ -285,11 +356,14 @@ def theend():
 
         for event in pygame.event.get():
             if event.type == QUIT:
-                exit()
+                sys.exit()
             elif event.type == KEYDOWN and event.key in (K_ESCAPE, K_SPACE):
-                exit()
+                sys.exit()
             elif event.type == KEYDOWN and event.key == K_F12:
                 pygame.image.save(vista.screen, "screenshot.png")
+            elif event.type == KEYDOWN and event.key == K_f:
+                settings.fullscreen = not settings.fullscreen
+                vista.init()
         vista.screen.fill((0,0,0))
         endthing.draw(vista.screen)
         hsthing.draw(vista.screen)
@@ -297,7 +371,6 @@ def theend():
 
 
 
-# TODO: show level goal
 def action():
     global level
     vista.levelinit(level)
@@ -345,7 +418,7 @@ def action():
         if paused:
             for event in pygame.event.get():
                 if event.type == QUIT:
-                    exit()
+                    sys.exit()
                 elif event.type == KEYDOWN and event.key == K_ESCAPE:
                     ending = True
                     endtitle = None
@@ -356,18 +429,24 @@ def action():
                         if record.unlocked > unlocked:
                             level = record.unlocked
                     paused = False
+                    noise.unpause()
                 elif event.type == KEYDOWN and event.key == K_F12:
                     pygame.image.save(vista.screen, "screenshot.png")
                 elif event.type == KEYDOWN and event.key == K_RETURN:
                     paused = False
+                    noise.unpause()
+                elif event.type == KEYDOWN and event.key == K_f:
+                    settings.fullscreen = not settings.fullscreen
+                    vista.init()
             vista.screen.blit(pausescreen, (0,0))
             pygame.display.flip()
             continue
         for event in pygame.event.get():
             if event.type == QUIT:
-                exit()
+                sys.exit()
             elif event.type == KEYDOWN and event.key == K_ESCAPE:
                 paused = True
+                noise.pause()
                 pausescreen = pygame.Surface(vista.screen.get_size()).convert_alpha()
                 fade = pygame.Surface(vista.screen.get_size()).convert_alpha()
                 fade.fill((0,0,0,128))
@@ -384,6 +463,9 @@ def action():
             elif event.type == KEYDOWN and event.key == K_TAB:
                 settings.hidefeatnames = not settings.hidefeatnames
                 feat.startlevel(False)
+            elif event.type == KEYDOWN and event.key == K_f:
+                settings.fullscreen = not settings.fullscreen
+                vista.init()
 
         k = pygame.key.get_pressed()
         kcombo = combo.check(k)

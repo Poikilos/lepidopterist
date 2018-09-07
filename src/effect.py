@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Graphic text effects
 
 import pygame, cPickle, os
@@ -7,10 +8,11 @@ import data, vista, noise
 fontcache = {}
 imgcache = {}
 
-#icachefile = data.filepath("imgcache.pkl")
-#if os.path.exists(icachefile):
-#    d = cPickle.load(open(icachefile, "rb"))
-#    imgcache = dict((key, pygame.image.fromstring(value, size, "RGBA")) for key, size, value in d)
+# Replace "LLL" in effect string with the pounds sign
+def addcurrency(s):
+    if "LLL" not in s: return s
+#    return s.replace("LLL", "£")    # Uncomment for Windows version
+    return unicode(s).replace("LLL", u"\u00A3")
 
 def savecache():
     return
@@ -43,7 +45,7 @@ class Effect(object):
         else:
             lines = self.texts[0].split("|")
             def renderlines(color):
-                imgs = [self.font.render(line, True, color) for line in lines]
+                imgs = [self.font.render(addcurrency(line), True, color) for line in lines]
                 if len(lines) == 1: return imgs[0]
                 w = max(img.get_width() for img in imgs)
                 h = sum(img.get_height() for img in imgs)
@@ -76,9 +78,11 @@ class Effect(object):
         self.age += dt
         if not self.expiring: return
         if self.age > self.duration(len(self.texts[0])):
-            self.age -= self.duration(len(self.texts[0]))
-            del self.texts[0]
-            if self.texts: self.render()
+            self.advance()
+    def advance(self):
+        self.age -= self.duration(len(self.texts[0]))
+        del self.texts[0]
+        if self.texts: self.render()
     def position(self, surf):
         self.rect.center = surf.get_rect().center
     def draw(self, surf):
@@ -106,13 +110,13 @@ class EndEffect(Effect):
         Effect.render(self)
 
 class StageNameEffect(Effect):
-    fontsize0 = 80
-    fontname0 = None
+    fontsize0 = 60
+    fontname0 = "freesansbold"
     color0 = 128, 128, 255
     color1 = 0, 0, 0
     def __init__(self, levelnum, goal, timeout):
         levelname = "Stage %s" % levelnum if levelnum < 6 else "Final Stage"
-        goaltext = u"Get \u00A3%s in %s seconds" % (goal, timeout)
+        goaltext = "Get LLL%s in %s seconds" % (goal, timeout)
         Effect.__init__(self, [levelname, goaltext])
 
 class EasyModeIndicator(Effect):
@@ -150,6 +154,14 @@ class Tip(Effect):
     def duration(self, n):
         return 1. + 0.06 * n
 
+class Credit(Effect):
+    fontsize0 = 32
+    fontname0 = "Merkin"
+    color0 = 0,64,64
+    color1 = 255,255,255
+    def duration(self, n):
+        return 2. + 0.005 * n
+
 class PauseTitle(Effect):
     expiring = False
 
@@ -167,8 +179,8 @@ class PauseInfo(Effect):
         self.rect.move_ip(0, 120)
 
 class HighScoreTotal(Effect):
-    fontname0 = None
-    fontsize0 = 52
+    fontname0 = "freesansbold"
+    fontsize0 = 40
     expiring = False
     color0 = 255,255,255
     color1 = 0,0,0
@@ -196,8 +208,8 @@ class AchievementEffect(Effect):
         Effect.render(self)
 
 class CachedEffect(Effect):
-    fontsize0 = 40
-    fontname0 = None
+    fontsize0 = 30
+    fontname0 = "freesansbold"
     expiring = False
     color0 = 255, 255, 255
     color1 = 0, 0, 0
@@ -257,47 +269,47 @@ class HeightIndicator(CachedEffect):
         self.rect.bottom = surf.get_height() - 10
 
 class ProgressIndicator(CachedEffect):
-    fontname0 = None
-    fontsize0 = 48
+    fontname0 = "freesansbold"
+    fontsize0 = 38
     def __init__(self, goal):
-        CachedEffect.__init__(self, u"\u00A30/%s" % goal)
+        CachedEffect.__init__(self, "LLL0/%s" % goal)
         self.goal = goal
     def update(self, val):
-        CachedEffect.update(self, u"\u00A3%s/%s" % (val, self.goal))
+        CachedEffect.update(self, "LLL%s/%s" % (val, self.goal))
     def position(self, surf):
-        self.rect.right = surf.get_width() - 30
+        self.rect.right = surf.get_width() - 12
         self.rect.bottom = surf.get_height() - 10
 
 class BonusIndicator(Effect):
-    fontsize0 = 40
-    fontname0 = None
+    fontsize0 = 28
+    fontname0 = "freesansbold"
     expiring = True
     color0 = 255, 255, 255
     color1 = 0, 0, 0
     bratio = 18
     def __init__(self, hb):
         noise.play("cha-ching")
-        Effect.__init__(self, [u"\u00A3%s" % hb])
+        Effect.__init__(self, ["LLL%s" % hb])
 
 class CostIndicator(Effect):
-    fontsize0 = 30
-    fontname0 = None
+    fontsize0 = 22
+    fontname0 = "freesansbold"
     expiring = False
     color0 = 255, 255, 255
     color1 = 0, 0, 0
     bratio = 18
     def __init__(self, cost, n = 0):
-        Effect.__init__(self, [u"\u00A3%s" % cost if cost else "maxed out"])
+        Effect.__init__(self, ["LLL%s" % cost if cost else "maxed out"])
         self.n = n
     def update(self, cost):
-        self.texts[0] = u"\u00A3%s" % cost if cost else "maxed out"
+        self.texts[0] = "LLL%s" % cost if cost else "maxed out"
         self.render()
     def position(self, surf):
         self.rect.topleft = 460, 72 + 32 * self.n
 
 class HighScoreEffect(CachedEffect):
-    fontsize0 = 28
-    fontname0 = None
+    fontsize0 = 22
+    fontname0 = "freesansbold"
     def position(self, surf):
         self.rect.top = 90
         self.rect.centerx = surf.get_rect().centerx
@@ -313,12 +325,12 @@ class HCRecord(Effect):
         self.rect.right = surf.get_rect().right - 20
 
 class BankIndicator(CostIndicator):
-    fontsize0 = 55
+    fontsize0 = 40
     def __init__(self, bank, n = 0):
-        Effect.__init__(self, [u"\u00A3%s" % bank])
+        Effect.__init__(self, ["LLL%s" % bank])
         self.n = n
     def update(self, bank):
-        self.texts[0] = u"\u00A3%s" % bank
+        self.texts[0] = "LLL%s" % bank
         self.render()
     def position(self, surf):
         self.rect.top = surf.get_rect().top + 10
@@ -366,7 +378,7 @@ class CountdownIndicator(CachedEffect):
     color1 = 0, 0, 0
     def __init__(self, start):
         self.timeleft = start
-        CachedEffect.__init__(self, str(start))
+        CachedEffect.__init__(self, "time:" + str(start))
     def think(self, dt):
         CachedEffect.think(self, dt)
         self.timeleft -= dt

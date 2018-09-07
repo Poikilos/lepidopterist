@@ -7,6 +7,7 @@
 2|8|Tip:|Sometimes it's a good idea to|revisit stages, to get more|money or catch species you|missed.
 2|8|Tip:|If you stay in the air long|enough, your bars will refill.|They also refill when you|touch the ground.
 2|8|Tip:|Bars on the right refill more|quickly than bars on the left.|Keep the levels high to maximise|efficiency.
+2|8|Tip:|Actions won't work if you hit|too many keys at once. Take|it easy. Try to perform one|action per second.
 2|4|Tip:|Some actions require you to|press two keys at the same|time.
 2|4|Tip:|To perform a combo, perform|more than one action in a row|without touching the ground.
 3|4|Tip:|You get bonuses for setting|combo and height records. They|don't add to your level score,|but you can spend them to|upgrade abilities.
