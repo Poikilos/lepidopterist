@@ -36,4 +36,8 @@ LICENSE:
 All copyrights to source code and artwork are waived under a Creative Commons Zero
 waiver.
 
+FONT LICENSE:
+The font Fighting Spirit is freeware for non-commercial use, by Teabeer Studios:
+http://www.fontspace.com/teabeer-studios/fighting-spirit-tbs
+
 
