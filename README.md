@@ -1,4 +1,11 @@
 # Mortimer the Lepidopterist
+Mortimer the Lepidopterist by Christopher Night (cosmologicon) Winner (Individual) for Pyweek 2010-08.<br/>
+Forked by poikilos: <https://github.com/poikilos/lepidopterist>
+(old versions were uploaded as separate commits)
+
+Original Pygame.org project page:
+<https://www.pygame.org/project-Mortimer+the+Lepidopterist-1696-2949.html><br/>
+
 
 Entry in PyWeek #11  <http://www.pyweek.org/11/><br/>
 Team: Universe Factory 11<br/>
