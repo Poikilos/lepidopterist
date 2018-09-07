@@ -21,7 +21,7 @@ addcombo((K_UP, K_SPACE), "twirl")
 addcombo((K_RIGHT, K_SPACE), "roll-r")
 addcombo((K_LEFT, K_SPACE), "roll-l")
 addcombo((K_RIGHT, K_UP), "dart-r")
-addcombo((K_LEFT, K_UP), "dart-l")
+addcombo((K_LEFT, K_UP), "dart-l")  # bound and dart are opposites
 
 def check(pressed):
     global waspressed, combokeys, combostart

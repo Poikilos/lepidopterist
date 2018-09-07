@@ -1,54 +1,83 @@
-The Lepidopterist
-=================
+Mortimer the Lepidopterist
+==========================
 
 Entry in PyWeek #11  <http://www.pyweek.org/11/>
 Team: Universe Factory 11
-Members: Cosmologicon
+Members: Christopher Night (Cosmologicon)
+
+DEPENDENCIES: python (tested on 2.6.2) and pygame (tested on 1.9.1)
 
 
-DEPENDENCIES:
-
-You might need to install some of these before running the game:
-
-  Python:     http://www.python.org/
-  PyGame:     http://www.pygame.org/
+RUNNING THE GAME: python run_game.py
 
 
+CONTROLS:
 
-RUNNING THE GAME:
+Arrow keys + space bar
+Esc to quit
+Tab to shrink the heads-up display
 
-On Windows or Mac OS X, locate the "run_game.pyw" file and double-click it.
+Follow the in-game tips.
 
-Othewise open a terminal / console and "cd" to the game directory and run:
-
-  python run_game.py
-
+If the game is too hard, enter this cheat code on the stage select screen:
+up up down down up up down down
 
 
-HOW TO PLAY THE GAME:
+HOW TO PLAY:
 
-Arrow keys
-Space bar
+1. Catch butterflies
+2. Earn money
+3. Buy upgrades that give you more abilities
+4. Repeat
+
+
+COMMAND-LINE OPTIONS:
+--nosound: disable sound effects
+--nomusic: disable music
+--savegame=NAME: use the specified save game instead of the default
+--restart: start the game over
+--alwaysshow: repeat cutscenes even if you've already seen them
 
 
 LICENSE:
 
-All code and most of the artwork (exceptions below) are original creations of
-Christopher Night. The copyrights to these are waived with a Creative Commons
-Zero waiver. They may be freely distributed with no 
+All code and sprite artwork are original creations of Christopher Night.
+The copyrights to these are waived with a Creative Commons Zero waiver.
+They may be freely distributed with no attribution.
 
 Resources created by other people distributed with this game include:
 
-FONT LICENSE:
-The font Fighting Spirit is freeware for non-commercial use, by Teabeer Studios:
+TEXTURES (data/*.jpg) are copyright cgtextures.com.
+They are free for non-commercial use.
+
+FONTS are licensed as follows:
+Merkin is freeware for all use, by Apostrophic Labs:
+http://www.fontspace.com/apostrophic-lab/merkin
+Kool Beans is freeware for all use, by Insanitype:
+http://www.fontspace.com/insanitype/kool-beans
+Quigley Wiggly is freeware for all use, by Nick's Fonts:
+http://www.fontspace.com/nicks-fonts/quigley-wiggly
+Fighting Spirit is freeware for non-commercial use, by Teabeer Studios:
 http://www.fontspace.com/teabeer-studios/fighting-spirit-tbs
+SF Arch Rival is freeware for non-commercial use, by ShyFoundry:
+http://www.fontspace.com/shyfoundry/sf-arch-rival
 
-The font Anonymous is freeware, by Mark Simonson:
-http://www.fontspace.com/mark-simonson/anonymous
-See the file Anonymous-documentation.pdf for more information.
+MUSIC is licensed as follows:
+The Annual New England Xylophone Symposium is CC-BY by DoKashiteru:
+http://ccmixter.org/files/DoKashiteru/19848
+Another Girl (Instrumental) is CC-BY-NC by duckett:
+http://ccmixter.org/files/duckett/23334
+One Five Nine (SR Mix) is CC-BY-NC by IamTheStev
+http://ccmixter.org/files/IamTheStev/19649
+Gnosseinne 1 is CC-BY-NC by Erik Satie, arranged by Chad Crouch:
+http://chadcrouch.bandcamp.com/track/gnossienne-1
 
-TEXTURE LICENSE
-grass.jpg based on GrassTall0012 from cgtextures.com:
-http://www.cgtextures.com/texview.php?id=16478
+SOUND EFFECTS are edited from the following sources:
+Till with Bell is CC-SAMPLING+ by Benboncan
+http://www.freesound.org/samplesViewSingle.php?id=91924
+Swoosh is CC-SAMPLING+ by qubodup
+http://www.freesound.org/samplesViewSingle.php?id=60009
+Video Game Power Up is free by AllMusicLibrary:
+http://www.allmusiclibrary.com/free_sound_effects.php
 
 
