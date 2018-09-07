@@ -116,7 +116,7 @@ def draw(facingright = True, shopping = False):
     
 def land():
     for f in known:
-        if f != "nab":
+#        if f != "nab":
             bars[f] = known[f]
             feattick[f] = 0
 

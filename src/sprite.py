@@ -173,7 +173,7 @@ class BlueFairy(Butterfly):
     fnames = ("fairy-blue",)
     ymin, ymax = 300, 500
     name = "bfairy"
-    fullname = "Annoying Hylian Fairy"
+    fullname = "Annoying Kokiri Fairy"
     value = 8
     vx0, vy0 = 600, 200
     flighttime = 0.2
