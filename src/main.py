@@ -1,8 +1,10 @@
 import pygame, math, random, sys
 from pygame.locals import *
+import datetime
 import data, combo, effect, vista, feat, sprite, settings, record, loadlevel, noise, game
 
 level = 1
+enable_easy = False
 
 def main():
     global level
@@ -86,12 +88,13 @@ def worldmap():
             elif event.type == KEYDOWN and event.key in (K_UP, K_DOWN):
                 udseq.append(0 if event.key == K_UP else 1)
                 # Activate Easy Mode
-                if len(udseq) >= 8 and tuple(udseq[-8:]) == (0,0,1,1,0,0,1,1) and not settings.easy:
-                    settings.easy = True
-                    esign = effect.EasyModeIndicator(["Easy Mode Activated!"])
-                    esign.position(vista.screen)
-                    udseq = []
-                    noise.play("cha-ching")
+                if enable_easy:
+                    if len(udseq) >= 8 and tuple(udseq[-8:]) == (0,0,1,1,0,0,1,1) and not settings.easy:
+                        settings.easy = True
+                        esign = effect.EasyModeIndicator(["Easy Mode Activated!"])
+                        esign.position(vista.screen)
+                        udseq = []
+                        noise.play("cha-ching")
                 # Display all cut scenes
                 if len(udseq) >= 8 and tuple(udseq[-8:]) == (0,1,1,1,1,0,0,0):
                     settings.alwaysshow = True
@@ -719,6 +722,12 @@ def action():
                     level = record.unlocked
             else:
                 w = ["Stage incomplete"]
+            with open('contestdata.txt','a') as myfile:
+                now = datetime.datetime.now()
+                myfile.write(str(now)+'\n')
+                myfile.write('level='+str(level)+'\n')
+                myfile.write('record.catchamount='+str(record.catchamount)+'\n')
+                myfile.write('record.collected='+str(record.collected)+'\n')
             w += feat.checknewfeat(len(record.collected))
             endtitle = effect.EndEffect(w)
         if ending and endtitle:

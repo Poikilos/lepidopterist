@@ -108,3 +108,5 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+/savegame.pkl
+/contestdata.txt
