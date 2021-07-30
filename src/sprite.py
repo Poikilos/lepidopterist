@@ -2,7 +2,7 @@
 
 import pygame, random, math
 from pygame.locals import *
-from . import data, vista, settings
+import data, vista, settings
 
 frames = {}
 class Frame(object):
