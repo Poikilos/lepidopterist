@@ -1,7 +1,7 @@
 # Level loading, duh
 
 import random
-import sprite, data, settings
+from . import sprite, data, settings
 
 levelset = {}
 levelset[1] = dict((
@@ -70,7 +70,7 @@ def load(level):
         timeout = 90
         
     butterflies = []
-    for kind, number in levelset[level].items():
+    for kind, number in list(levelset[level].items()):
         butterflies += [kind() for j in range(number)]
 
     return butterflies, goal, timeout
@@ -78,7 +78,7 @@ def load(level):
 def newbutterflies(level, dt):
     if not 1 <= level <= 6: return []
     newbs = []
-    for kind, number in levelset[level].items():
+    for kind, number in list(levelset[level].items()):
         if random.uniform(0, (60. if settings.easy else 120.)/number) < dt:
             newbs.append(kind())
     return newbs

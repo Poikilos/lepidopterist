@@ -2,7 +2,7 @@
 
 import pygame, os
 from pygame import *
-import data, settings, loadlevel
+from . import data, settings, loadlevel
 
 sx0, sy0 = None, None
 backdrops = {}
@@ -97,7 +97,8 @@ def constrain(x, y, rx = 0, ry = 0):
     y = max(min(y, vy1 - ry), vy0 + ry)
     return x, y
 
-def position((x,y), facingright, vy):
+def position(xxx_todo_changeme, facingright, vy):
+    (x,y) = xxx_todo_changeme
     global gx, gy, sx0, sy0
     gx = x - sx/2 + (200 if facingright else -200)
     gy = y - sy/2 + 60
@@ -125,20 +126,25 @@ def clear():
 #    screen.fill((0, 128, 0), pygame.Rect(0, sy - (40 - sy0), 9999, 9999))
     screen.blit(backdrop, (int(0 - sx0), int(sy - (vy1 - sy0))))
 
-def blit(img, (x, y)):
+def blit(img, xxx_todo_changeme1):
+    (x, y) = xxx_todo_changeme1
     screen.blit(img, (int(x - sx0), int(sy - (y - sy0))))
 
-def dot((x, y)):
+def dot(xxx_todo_changeme2):
+    (x, y) = xxx_todo_changeme2
     pygame.draw.circle(screen, (255, 128, 0), (int(x - sx0), int(sy - (y - sy0))), 4)
 
-def line((x0, y0), (x1, y1), color0=(255, 255, 255), color1=(0,0,0)):
+def line(xxx_todo_changeme3, xxx_todo_changeme4, color0=(255, 255, 255), color1=(0,0,0)):
+    (x0, y0) = xxx_todo_changeme3
+    (x1, y1) = xxx_todo_changeme4
     p0 = (int(x0 - sx0), int(sy - (y0 - sy0)))
     p1 = (int(x1 - sx0), int(sy - (y1 - sy0)))
     pygame.draw.line(screen, color0, p0, p1, 8)
     pygame.draw.line(screen, color1, p0, p1, 4)
 
 
-def circle((x, y), r, color=(255,128,0)):
+def circle(xxx_todo_changeme5, r, color=(255,128,0)):
+    (x, y) = xxx_todo_changeme5
     pygame.draw.circle(screen, color, (int(x - sx0), int(sy - (y - sy0))), int(r), 1)
 
 

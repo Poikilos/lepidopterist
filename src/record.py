@@ -1,7 +1,7 @@
 # Keeping track of records
 
 import random
-import settings
+from . import settings
 
 heightrecord = 1
 comborecord = 1

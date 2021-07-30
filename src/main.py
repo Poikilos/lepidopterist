@@ -1,7 +1,7 @@
 import pygame, math, random, sys
 from pygame.locals import *
 import datetime
-import data, combo, effect, vista, feat, sprite, settings, record, loadlevel, noise, game
+from . import data, combo, effect, vista, feat, sprite, settings, record, loadlevel, noise, game
 
 level = 1
 enable_easy = False
@@ -66,7 +66,7 @@ def worldmap():
     while True:
         dt = clock.tick(60) * 0.001
         if settings.printfps and random.random() < dt:
-            print clock.get_fps()
+            print(clock.get_fps())
 
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -183,7 +183,7 @@ def cutscene():
         dt = clock.tick(60) * 0.001
         dticker += dt
         if settings.printfps and random.random() < dt:
-            print clock.get_fps()
+            print(clock.get_fps())
 
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -210,7 +210,7 @@ def cutscene():
             del dlines[0]
 
         dialogue.think(dt)
-        
+
         for j in range(100):
             if random.random() < dt:
                 drawbackgroundline(random.randint(100, 299))
@@ -219,7 +219,7 @@ def cutscene():
         sprite.frames["head-%s" % speaker].place((0,0))
         dialogue.draw(vista.screen)
         pygame.display.flip()
-    
+
 
 def showtip():
     alltips = open(data.filepath("tips.txt")).readlines()
@@ -230,7 +230,7 @@ def showtip():
     while True:
         dt = clock.tick(60) * 0.001
         if settings.printfps and random.random() < dt:
-            print clock.get_fps()
+            print(clock.get_fps())
 
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -272,7 +272,7 @@ def shop():
     while True:
         dt = clock.tick(60) * 0.001
         if settings.printfps and random.random() < dt:
-            print clock.get_fps()
+            print(clock.get_fps())
 
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -322,7 +322,7 @@ def rollcredits():
 
         dt = clock.tick(60) * 0.001
         if settings.printfps and random.random() < dt:
-            print clock.get_fps()
+            print(clock.get_fps())
 
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -355,7 +355,7 @@ def theend():
     while True:
         dt = clock.tick(60) * 0.001
         if settings.printfps and random.random() < dt:
-            print clock.get_fps()
+            print(clock.get_fps())
 
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -416,7 +416,7 @@ def action():
     while True:
         dt = clock.tick(60) * 0.001
         if settings.printfps and random.random() < dt:
-            print clock.get_fps()
+            print(clock.get_fps())
 
         if paused:
             for event in pygame.event.get():
@@ -471,6 +471,7 @@ def action():
                 vista.init()
 
         k = pygame.key.get_pressed()
+
         kcombo = combo.check(k)
 
         if grounded:
@@ -699,7 +700,7 @@ def action():
         vista.position((x, y), facingright, vy)
 
         butterflies += loadlevel.newbutterflies(level, dt)
-        
+
         feat.think(dt)
         vista.think(dt)
         for b in butterflies: b.think(dt)
@@ -732,8 +733,8 @@ def action():
             endtitle = effect.EndEffect(w)
         if ending and endtitle:
             endtitle.think(dt)
-            
-        
+
+
         vista.clear()
         sprite.frames[picname].draw((x, y))
         for b in butterflies:

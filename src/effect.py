@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 # Graphic text effects
 
-import pygame, cPickle, os
+import pygame, pickle, os
 from pygame.locals import *
-import data, vista, noise
+from . import data, vista, noise
 
 fontcache = {}
 imgcache = {}
@@ -12,12 +12,12 @@ imgcache = {}
 def addcurrency(s):
     if "LLL" not in s: return s
 #    return s.replace("LLL", "£")    # Uncomment for Windows version
-    return unicode(s).replace("LLL", u"\u00A3")
+    return str(s).replace("LLL", "\u00A3")
 
 def savecache():
     return
-    d = [(key, value.get_size(), pygame.image.tostring(value, "RGBA")) for key, value in imgcache.items()]
-    cPickle.dump(d, open(icachefile, "wb"))
+    d = [(key, value.get_size(), pygame.image.tostring(value, "RGBA")) for key, value in list(imgcache.items())]
+    pickle.dump(d, open(icachefile, "wb"))
 
 class Effect(object):
     fontsize0 = 120
@@ -89,7 +89,7 @@ class Effect(object):
         if not self.texts: return
         self.position(surf)
         surf.blit(self.image, self.rect)
-    def __nonzero__(self):
+    def __bool__(self):
         return bool(self.texts)
 
 class EndEffect(Effect):
@@ -363,7 +363,8 @@ class ComboBonusIndicator(BonusIndicator):
         self.rect.bottom = surf.get_height() - 50 - int(self.age * 10)
 
 class NabBonusIndicator(BonusIndicator):
-    def __init__(self, amt, (x0, y0)):
+    def __init__(self, amt, xxx_todo_changeme):
+        (x0, y0) = xxx_todo_changeme
         BonusIndicator.__init__(self, amt)
         self.x0, self.y0 = x0, y0
     def draw(self, surf):

@@ -60,7 +60,7 @@ if __name__ == "__main__":
         pygame.event.get()
         k = pygame.key.get_pressed()
         r = check(k)
-        if r: print r
+        if r: print(r)
         if k[K_ESCAPE]:
             exit()
 

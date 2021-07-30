@@ -2,23 +2,26 @@
 
 import pygame, random, math
 from pygame.locals import *
-import data, vista, settings
+from . import data, vista, settings
 
 frames = {}
 class Frame(object):
-    def __init__(self, filename, (dx, dy), hflip = False):
+    def __init__(self, filename, xxx_todo_changeme, hflip = False):
+        (dx, dy) = xxx_todo_changeme
         self.filename = filename
         self.image = pygame.image.load(data.filepath(self.filename)).convert_alpha()
         if hflip:
             self.image = pygame.transform.flip(self.image, True, False)
         self.dx, self.dy = dx, dy
         self.nabbed = False
-    def draw(self, (x, y)):
+    def draw(self, xxx_todo_changeme1):
+        (x, y) = xxx_todo_changeme1
         vista.blit(self.image, (x - self.dx, y + self.dy))
         if settings.showdots:
             vista.dot((x, y))
 #        pygame.draw.circle(surf, (255, 128, 0, 255), (int(px), int(py)), 4)
-    def place(self, (x,y)):  # Doesn't use the vista's transformation.
+    def place(self, xxx_todo_changeme2):  # Doesn't use the vista's transformation.
+        (x,y) = xxx_todo_changeme2
         vista.screen.blit(self.image, (x - self.dx, y - self.dy))
     def reverse(self):
         return Frame(self.filename, (self.image.get_width() - self.dx, self.dy), True)
@@ -58,7 +61,7 @@ def load():
     frames["fairy-blue"] = Frame("fairy-blue.png", (36, 36))
     frames["fairy-red"] = Frame("fairy-red.png", (36, 36))
     frames["fairy-green"] = Frame("fairy-green.png", (36, 36))
-    for k in frames.keys():
+    for k in list(frames.keys()):
         frames[k + "-b"] = frames[k].reverse()
 
     frames["twirl0"] = Frame("twirl-0.png", (84, 150))
@@ -71,7 +74,7 @@ def load():
     frames["key-up"] = Frame("key-up.png", (20, 20))
     frames["key-left"] = Frame("key-left.png", (20, 20))
     frames["key-right"] = Frame("key-right.png", (20, 20))
-    
+
     frames["head-m"] = Frame("head-mortimer.png", (-100,-100))
     frames["head-e"] = Frame("head-elmer.png", (-500,-100))
     frames["head-s"] = Frame("head-sensei.png", (-500,-100))

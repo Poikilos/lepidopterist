@@ -2,7 +2,7 @@
 
 import pygame, random
 from pygame.locals import *
-import vista, effect, settings, sprite
+from . import vista, effect, settings, sprite
 
 allfeats = ("nab", "leap", "turn", "twirl", "bound", "dart", "roll")
 
@@ -45,7 +45,7 @@ def startlevel(fillbars = True):
         if featname in known:
             name = featname
             feateffects[featname] = effect.FeatIndicator(name, len(feateffects))
-    for f in feateffects.values():
+    for f in list(feateffects.values()):
         f.position(vista.screen)
     currentfeattick = 0
 

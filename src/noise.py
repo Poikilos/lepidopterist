@@ -1,5 +1,5 @@
 import pygame
-import data, settings
+from . import data, settings
 
 sounds = {}
 songs = {}
