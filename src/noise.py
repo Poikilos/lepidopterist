@@ -1,5 +1,9 @@
+#!/usr/bin/env python3
+'''
+Load and manage sound effects and music.
+'''
 import pygame
-from . import data, settings
+import data, settings
 
 sounds = {}
 songs = {}

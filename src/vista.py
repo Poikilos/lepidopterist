@@ -1,8 +1,11 @@
-# Controls the gameplay area and also the screen
+#!/usr/bin/env python3
+'''
+Define the game world model and the screen.
+'''
 
 import pygame, os
 from pygame import *
-from . import data, settings, loadlevel
+import data, settings, loadlevel
 
 sx0, sy0 = None, None
 backdrops = {}
@@ -21,6 +24,10 @@ def makegrass(level):
         backdrop = backdrops[level]
         return
     backdropfile = data.filepath("backdrop-%s.png" % level)
+    backdrop = None
+    image0 = None
+    image1 = None
+    bcolor = None
     if os.path.exists(backdropfile):
         backdrop = backdrops[level] = pygame.image.load(backdropfile).convert_alpha()
         return
@@ -50,8 +57,18 @@ def makegrass(level):
         bcolor = 192, 92, 128
     else:
         image0 = pygame.image.load(level).convert_alpha()
+        bcolor = 0, 0, 0
     w0, h0 = image0.get_size()
     yf0 = int(h0/2)
+    w1 = None
+    h1 = None
+    enable_test = False
+    if image1 is None:
+        # This must be a test mode.
+        print("Warning: image1 is not present,"
+              " so the size of image0 will be used.")
+        image1 = image0
+        enable_test = True
     w1, h1 = image1.get_size()
     yf1 = int(150 * h1 / (vy1-vy0-300))
 
@@ -75,13 +92,14 @@ def makegrass(level):
 
     grass = pygame.transform.scale(image0, (vx1-vx0,200))
     sky = pygame.transform.scale(image1, (vx1-vx0,(vy1-vy0-300)))
-    
+
     backdrop = pygame.Surface((vx1-vx0,vy1-vy0)).convert_alpha()
     backdrop.fill(bcolor)
     backdrop.blit(sky,(0,0))
     backdrop.blit(grass,(0,vy1-vy0-200))
     backdrops[level] = backdrop
-    pygame.image.save(backdrop, backdropfile)
+    if not enable_test:
+        pygame.image.save(backdrop, backdropfile)
 
 def levelinit(level):
     global vx0, vx1, vy0, vy1
@@ -149,20 +167,31 @@ def circle(xxx_todo_changeme5, r, color=(255,128,0)):
 
 
 if __name__ == "__main__":
+    # Go to a module test mode if the module runs directly.
     pygame.init()
+    pygame.joystick.init()
+    joysticks = [pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_count())]
+    if len(joysticks) > 0:
+        for joystick in joysticks:
+            joystick.init()
     init()
     global vx0, vx1, vy0, vy1
     vx0, vx1, vy0, vy1 = loadlevel.getbox(1)
     position((200,100), True, 0)
     import os
-    for f in sorted(os.listdir("dev-data")):
-        if not f.endswith("jpg"): continue
-        makegrass("dev-data/" + f)
+    # dev_data = "dev-data"
+    dev_data = data.get_data_dir()
+    for f in sorted(os.listdir(dev_data)):
+        if not f.endswith("jpg"):
+            continue
+        makegrass(os.path.join(dev_data, f))
         clear()
         pygame.display.flip()
         while True:
             es = pygame.event.get()
             if any(e.type in (KEYDOWN, MOUSEBUTTONDOWN) for e in es):
+                break
+            if any(e.type in (JOYBUTTONDOWN, ) for e in es):
                 break
             if any(e.type == QUIT for e in es):
                 exit()

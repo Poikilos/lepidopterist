@@ -1,5 +1,9 @@
+#!/usr/bin/env
+'''
+Manage persistent data.
+'''
 import pickle, os
-from . import data, feat, record, settings
+import data, feat, record, settings
 
 def save():
     state = feat.known, record.getstate()

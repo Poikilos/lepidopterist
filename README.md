@@ -11,6 +11,13 @@ Entry in PyWeek #11  <http://www.pyweek.org/11/><br/>
 Team: Universe Factory 11<br/>
 Members: Christopher Night (Cosmologicon)<br/>
 
+
+## Differences in Poikilos' fork
+- Save the most recent statistics in a machine-readable format.
+  - For running contests, collect and clear it (and savegame.pkl) between players manually or using another script.
+    A score of 100 is good (in about 10 minutes) as a maximum for percentage-based player or team scores.
+
+
 ## Requires
 python (tested on 2.6.2) and pygame (tested on 1.9.1)
 

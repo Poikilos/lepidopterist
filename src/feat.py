@@ -1,8 +1,11 @@
-# System for keeping track of available feats
+#!/usr/bin/env
+'''
+Keep track of available feats.
+'''
 
 import pygame, random
 from pygame.locals import *
-from . import vista, effect, settings, sprite
+import vista, effect, settings, sprite
 
 allfeats = ("nab", "leap", "turn", "twirl", "bound", "dart", "roll")
 
@@ -59,7 +62,7 @@ def attempt(featname):
     feattick[featname] = growtime(bars[featname], known[featname])
     currentfeat, currentfeattick = featname, 0.4
     return True
-    
+
 def think(dt):
     global currentfeattick
     for featname in known:
@@ -83,7 +86,7 @@ def draw(facingright = True, shopping = False):
             xoff, yoff = -105, 0
         else:
             xoff, yoff = 0, 0
-    
+
     if currentfeattick and not settings.hidefeatnames:
         for n,f in enumerate(allfeats):
             if f == currentfeat:
@@ -112,8 +115,8 @@ def draw(facingright = True, shopping = False):
             pygame.draw.rect(img, (255, 255, 255), r, 2)
     if shopping:
         vista.screen.blit(img, (xoff, yoff))
-    
-    
+
+
 def land():
     for f in known:
 #        if f != "nab":

@@ -1,7 +1,10 @@
-# Keeping track of records
+#!/usr/bin/env python3
+'''
+Record statistics.
+'''
 
 import random
-from . import settings
+import settings
 
 heightrecord = 1
 comborecord = 1
@@ -65,7 +68,7 @@ def checknab(b):
     else:
         collected[b.name] = 1
         newcollections.append(b.fullname)
-    
+
 def checknabgrounded(b):
     global collected, catchamount
     catchamount += b.value

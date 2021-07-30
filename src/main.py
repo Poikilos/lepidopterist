@@ -1,7 +1,12 @@
+#!/usr/bin/env python3
+'''
+Define and control the game states.
+'''
 import pygame, math, random, sys
 from pygame.locals import *
 import datetime
-from . import data, combo, effect, vista, feat, sprite, settings, record, loadlevel, noise, game
+import data, combo, effect, vista, feat, sprite, settings, record, loadlevel, noise, game
+import time
 
 level = 1
 enable_easy = False
@@ -10,6 +15,11 @@ def main():
     global level
     pygame.mixer.pre_init(11025, -16, 2, 256)
     pygame.init()
+    pygame.joystick.init()
+    joysticks = [pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_count())]
+    if len(joysticks) > 0:
+        for joystick in joysticks:
+            joystick.init()
     vista.init()
     noise.init()
     sprite.load()
@@ -29,7 +39,7 @@ def main():
         cutscene()
         record.visit(level)
         showtip()
-        action()
+        action(joysticks)
         record.combinemoney()
         game.save()
         if record.unlocked > 6:  # Ending sequence
@@ -40,8 +50,14 @@ def main():
             rollcredits()
             theend()
         noise.play("girl")
-        shop()
+        shop(joysticks)
         game.save()
+
+def less_than_any(left_operand, right_operands):
+    for r in right_operands:
+        if left_operand < r:
+            return True
+    return False
 
 def worldmap():
     global level
@@ -63,24 +79,47 @@ def worldmap():
     updateteffect = True
     udseq = []
     esign, rsign = None, None
+    pressing = []
+    used_keys = (K_ESCAPE, K_F12, K_RIGHT, K_LEFT, K_UP, K_DOWN,
+                 K_SPACE, K_f)
+    # ^ All of the used keys must be in here unless a refactor is
+    #   done such as setting states using events rather than
+    #   using the combo.soft_input workaround function.
     while True:
         dt = clock.tick(60) * 0.001
         if settings.printfps and random.random() < dt:
             print(clock.get_fps())
-
         for event in pygame.event.get():
+            keys_changed = False
             if event.type == QUIT:
                 sys.exit()
-            elif event.type == KEYDOWN and event.key == K_ESCAPE:
+                # ^ This is OK since QUIT already occurred.
+            elif event.type == KEYDOWN:
+                while (len(pressing) - 1) <= event.key:
+                    pressing.append(False)
+                pressing[event.key] = True
+                keys_changed = True
+            elif event.type == KEYUP:
+                while (len(pressing) - 1) <= event.key:
+                    pressing.append(False)
+                pressing[event.key] = False
+                keys_changed = True
+
+            while less_than_any(len(pressing) - 1, used_keys):
+                pressing.append(False)
+
+            if not keys_changed:
+                continue
+            elif pressing[K_ESCAPE]:
                 sys.exit()
-            elif event.type == KEYDOWN and event.key == K_F12:
+            elif pressing[K_F12]:
                 pygame.image.save(vista.screen, "screenshot.png")
-            elif event.type == KEYDOWN and event.key == K_RIGHT:
+            elif pressing[K_RIGHT]:
                 udseq = []
                 if level < record.unlocked:
                     level += 1
                     updateteffect = True
-            elif event.type == KEYDOWN and event.key == K_LEFT:
+            elif pressing[K_LEFT]:
                 udseq = []
                 if level > 1:
                     level -= 1
@@ -115,9 +154,9 @@ def worldmap():
                     rsign.position(vista.screen)
                     udseq = []
                     noise.play("cha-ching")
-            elif event.type == KEYDOWN and event.key == K_SPACE:
+            elif pressing[K_SPACE]:
                 return
-            elif event.type == KEYDOWN and event.key == K_f:
+            elif pressing[K_f]:
                 settings.fullscreen = not settings.fullscreen
                 vista.init()
 
@@ -186,10 +225,13 @@ def cutscene():
             print(clock.get_fps())
 
         for event in pygame.event.get():
+            done = False
             if event.type == QUIT:
                 sys.exit()
             elif event.type == KEYDOWN and event.key == K_ESCAPE:
-                return
+                done = True
+            elif event.type == JOYBUTTONDOWN:
+                done = True
             elif event.type == KEYDOWN and event.key == K_SPACE and dticker > 0.4:
                 dialogue = None
             elif event.type == KEYDOWN and event.key == K_F12:
@@ -197,6 +239,8 @@ def cutscene():
             elif event.type == KEYDOWN and event.key == K_f:
                 settings.fullscreen = not settings.fullscreen
                 vista.init()
+            if done:
+                return
 
         if not dialogue:
             if not dlines: return
@@ -233,17 +277,22 @@ def showtip():
             print(clock.get_fps())
 
         for event in pygame.event.get():
+            done = False
             if event.type == QUIT:
                 sys.exit()
             elif event.type == KEYDOWN and event.key in (K_ESCAPE, K_SPACE):
-                vista.screen.fill((0,0,0))
-                pygame.display.flip()
-                return
+                done = True
+            elif event.type == JOYBUTTONDOWN:
+                done = True
             elif event.type == KEYDOWN and event.key == K_F12:
                 pygame.image.save(vista.screen, "screenshot.png")
             elif event.type == KEYDOWN and event.key == K_f:
                 settings.fullscreen = not settings.fullscreen
                 vista.init()
+            if done:
+                vista.screen.fill((0,0,0))
+                pygame.display.flip()
+                return
 
         tip.think(dt)
 
@@ -252,7 +301,7 @@ def showtip():
         pygame.display.flip()
         if not tip: return
 
-def shop():
+def shop(joysticks):
     vista.mapinit()
     feat.startlevel()
     clock = pygame.time.Clock()
@@ -275,8 +324,31 @@ def shop():
             print(clock.get_fps())
 
         for event in pygame.event.get():
+            buy = False
             if event.type == QUIT:
                 sys.exit()
+            elif event.type == JOYBUTTONDOWN:
+                k = pygame.key.get_pressed()
+                pressed = combo.soft_input(k, joysticks)
+                if pressed[K_LEFT]:
+                    pass
+                elif pressed[K_RIGHT]:
+                    pass
+                elif pressed[K_UP]:
+                    # ^ K_UP is ambiguos: It could be the jump button
+                    #   as well.
+                    pointer -= 1
+                    pointer %= nfeat
+                elif pressed[K_DOWN]:
+                    pointer += 1
+                    pointer %= nfeat
+                elif pressed[K_BACKSPACE]:
+                    # Such as a joystick "back" (further right) button
+                    return
+                elif pressed[K_SPACE]:
+                    # Nab
+                    buy = True
+
             elif event.type == KEYDOWN and event.key == K_ESCAPE:
                 return
             elif event.type == KEYDOWN and event.key == K_F12:
@@ -291,6 +363,10 @@ def shop():
                 pointer += 1
                 pointer %= nfeat
             elif event.type == KEYDOWN and event.key == K_SPACE:
+                buy = True
+
+            if buy:
+                buy = False
                 if pointer == nfeat - 1:
                     return
                 cost = feat.getupgradecost(feats[pointer])
@@ -331,6 +407,8 @@ def rollcredits():
                 return
             elif event.type == KEYDOWN and event.key == K_SPACE:
                 credit.advance()
+            elif event.type == JOYBUTTONDOWN:
+                credit.advance()
             elif event.type == KEYDOWN and event.key == K_F12:
                 pygame.image.save(vista.screen, "screenshot.png")
             elif event.type == KEYDOWN and event.key == K_f:
@@ -362,6 +440,8 @@ def theend():
                 sys.exit()
             elif event.type == KEYDOWN and event.key in (K_ESCAPE, K_SPACE):
                 sys.exit()
+            elif event.type == JOYBUTTONDOWN:
+                pygame.image.save(vista.screen, "screenshot-end.png")
             elif event.type == KEYDOWN and event.key == K_F12:
                 pygame.image.save(vista.screen, "screenshot.png")
             elif event.type == KEYDOWN and event.key == K_f:
@@ -374,7 +454,7 @@ def theend():
 
 
 
-def action():
+def action(joysticks):
     global level
     vista.levelinit(level)
 
@@ -413,6 +493,12 @@ def action():
     seffect = effect.StageNameEffect(level, goal, timeout)
     feat.startlevel()
     pygame.event.get()
+    pressing = []
+    used_keys = (K_ESCAPE, K_F12, K_RIGHT, K_LEFT, K_UP, K_DOWN,
+                 K_SPACE, K_f)
+    # ^ All of the used keys must be in here unless a refactor is
+    #   done such as setting states using events rather than
+    #   using the combo.soft_input workaround function.
     while True:
         dt = clock.tick(60) * 0.001
         if settings.printfps and random.random() < dt:
@@ -445,9 +531,26 @@ def action():
             pygame.display.flip()
             continue
         for event in pygame.event.get():
+            keys_changed = False
             if event.type == QUIT:
                 sys.exit()
-            elif event.type == KEYDOWN and event.key == K_ESCAPE:
+            elif event.type == KEYDOWN:
+                while (len(pressing) - 1) <= event.key:
+                    pressing.append(False)
+                pressing[event.key] = True
+                keys_changed = True
+            elif event.type == KEYUP:
+                while (len(pressing) - 1) <= event.key:
+                    pressing.append(False)
+                pressing[event.key] = False
+                keys_changed = True
+
+            while less_than_any(len(pressing) - 1, used_keys):
+                pressing.append(False)
+
+            if not keys_changed:
+                continue
+            elif pressing[K_ESCAPE]:
                 paused = True
                 noise.pause()
                 pausescreen = pygame.Surface(vista.screen.get_size()).convert_alpha()
@@ -461,18 +564,18 @@ def action():
                 pauseinfo.position(pausescreen)
                 pausetitle.draw(pausescreen)
                 pauseinfo.draw(pausescreen)
-            elif event.type == KEYDOWN and event.key == K_F12:
+            elif pressing[K_F12]:
                 pygame.image.save(vista.screen, "screenshot.png")
-            elif event.type == KEYDOWN and event.key == K_TAB:
+            elif pressing[K_TAB]:
                 settings.hidefeatnames = not settings.hidefeatnames
                 feat.startlevel(False)
-            elif event.type == KEYDOWN and event.key == K_f:
+            elif pressing[K_f]:
                 settings.fullscreen = not settings.fullscreen
                 vista.init()
 
         k = pygame.key.get_pressed()
-
-        kcombo = combo.check(k)
+        pressed = combo.soft_input(k, joysticks)
+        kcombo = combo.check_input(pressed)
 
         if grounded:
             dx = 0
@@ -757,3 +860,9 @@ def action():
         if not endtitle:
             return
 
+if __name__ == "__main__":
+    print("")
+    print("This is an internal engine component.")
+    print("Use run_game instead.")
+    time.sleep(5)
+    exit(1)

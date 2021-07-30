@@ -1,4 +1,7 @@
-# This module is probably going to balloon out of control, but here goes.
+#!/usr/bin/env python3
+'''
+Define and manage sprites.
+'''
 
 import pygame, random, math
 from pygame.locals import *

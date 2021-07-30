@@ -1,7 +1,10 @@
-# Level loading, duh
+#!/usr/bin/env
+'''
+Load levels.
+'''
 
 import random
-from . import sprite, data, settings
+import sprite, data, settings
 
 levelset = {}
 levelset[1] = dict((
@@ -68,7 +71,7 @@ def load(level):
     if level == 6:
         goal = 600
         timeout = 90
-        
+
     butterflies = []
     for kind, number in list(levelset[level].items()):
         butterflies += [kind() for j in range(number)]

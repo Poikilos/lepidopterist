@@ -3,7 +3,7 @@
 
 import pygame, pickle, os
 from pygame.locals import *
-from . import data, vista, noise
+import data, vista, noise
 
 fontcache = {}
 imgcache = {}
