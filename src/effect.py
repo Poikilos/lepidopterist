@@ -12,7 +12,7 @@ imgcache = {}
 def addcurrency(s):
     if "LLL" not in s: return s
 #    return s.replace("LLL", "£")    # Uncomment for Windows version
-    return str(s).replace("LLL", "\u00A3")
+    return str(s).replace("LLL", u"\u00A3")
 
 def savecache():
     return
@@ -341,7 +341,7 @@ class HeightBonusIndicator(BonusIndicator):
     def position(self, surf):
         self.rect.left = 20
         self.rect.bottom = surf.get_height() - 50 - int(self.age * 10)
-    
+
 class ComboIndicator(CachedEffect):
     fontname0 = "KoolBean"
     fontsize0 = 48
@@ -392,7 +392,7 @@ class CountdownIndicator(CachedEffect):
     def position(self, surf):
         self.rect.bottom = surf.get_height() - 2
         self.rect.centerx = surf.get_rect().centerx + 140
-        
+
 
 class FeatIndicator(Effect):
     fontsize0 = 28
