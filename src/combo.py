@@ -29,8 +29,9 @@ def addcombo(keys, name):
 
 addcombo(('nab',), "nab")  # formerly K_SPACE
 addcombo(('jump',), "leap")  # formerly K_UP
-addcombo(('x>0',), "turn-r")  # formerly K_LEFT
-addcombo(('x<0',), "turn-l")  # formerly K_RIGHT
+addcombo(('x>0',), "turn-l")  # formerly K_LEFT
+addcombo(('x<0',), "turn-r")  # formerly K_RIGHT
+# ^ Why they are opposite: turning in mid-air is the combo
 addcombo(('y<0', 'nab'), "twirl")  # formerly (K_UP, K_SPACE)
 addcombo(('x>0', 'nab'), "roll-r")  # formerly (K_RIGHT, K_SPACE)
 addcombo(('x<0', 'nab'), "roll-l")  # formerly (K_LEFT, K_SPACE)

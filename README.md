@@ -1,25 +1,19 @@
 # Mortimer the Lepidopterist
+![screenshot](screenshot.png)
 Mortimer the Lepidopterist by Christopher Night (cosmologicon) Winner (Individual) for Pyweek 2010-08.<br/>
-Forked by poikilos: <https://github.com/poikilos/lepidopterist>
-(old versions were uploaded as separate commits)
-
-Original Pygame.org project page:
-<https://www.pygame.org/project-Mortimer+the+Lepidopterist-1696-2949.html><br/>
-
-
-Entry in PyWeek #11  <http://www.pyweek.org/11/><br/>
-Team: Universe Factory 11<br/>
-Members: Christopher Night (Cosmologicon)<br/>
+- Forked by poikilos: <https://github.com/poikilos/lepidopterist>
+  (old versions were uploaded as separate commits)
 
 
 ## Differences in Poikilos' fork
+- Use a gamepad or joystick along with keys (using the MIT Licensed SoftController module: src/controller.py from [github.com/poikilos/SoftController](https://github.com/poikilos/SoftController)).
 - Save the most recent statistics in a machine-readable format.
   - For running contests, collect and clear it (and savegame.pkl) between players manually or using another script.
-    A score of 100 is good (in about 10 minutes) as a maximum for percentage-based player or team scores.
+    A score of 100 is good (in about 10 minutes) as a maximum for percentage-based player or team scores if capped at 100.
 
 
 ## Requires
-python (tested on 2.6.2) and pygame (tested on 1.9.1)
+python3 (tested on 2.6.2) and pygame (tested on 1.9.4.post1)
 
 
 ## Running the Game
@@ -37,6 +31,7 @@ Cheat codes (enter on the stage select screen):<br/>
 up up down down up up down down - activate easy mode<br/>
 up down down down down up up up - watch all cut scenes and credits<br/>
 up down up up down up down down - delete the saved game and quit
+
 
 ## HOW TO PLAY:
 1. Catch butterflies
@@ -57,14 +52,25 @@ up down up up down up down down - delete the saved game and quit
 
 ## License
 
-Sprite Artwork and Code were relicensed (formerly below applied):<br/>
-"All code and sprite artwork are original creations of Christopher Night.
-The copyrights to these are waived with a Creative Commons Zero waiver.
-They may be freely distributed with no attribution."<br/>
-The licensing for Sprite Artwork and Code are below. However, other licenses apply other media (see Media section below).
+Sprite Artwork and Code were relicensed (formerly below applied):
+
+> All code and sprite artwork are original creations of Christopher Night.
+> The copyrights to these are waived with a Creative Commons Zero waiver.
+> They may be freely distributed with no attribution.
+
+-Christopher Night
+
+The licensing for "Sprite Artwork" and "Code" are below under those sections. However, other licenses apply other media (see Media section below).
 
 ### Code
 MIT License (see LICENSE file in text editor or at [github.com/poikilos/lepidopterist](https://github.com/poikilos/lepidopterist/blob/master/LICENSE).
+
+Original Pygame.org project page:
+<https://www.pygame.org/project-Mortimer+the+Lepidopterist-1696-2949.html><br/>
+
+Entry in PyWeek #11  <http://www.pyweek.org/11/><br/>
+Team: Universe Factory 11<br/>
+Members: Christopher Night (Cosmologicon)<br/>
 
 ### Media
 
@@ -74,7 +80,11 @@ They are free for non-commercial use.
 
 #### Sprite Artwork
 Creative Commons Zero
-Christopher Night
+- Christopher Night
+- Jake "Poikilos" Gustafson
+  - button.png
+  - button-*.png
+  - key-return.png
 
 #### Fonts
 * Merkin is freeware for all use, by Apostrophic Labs: <http://www.fontspace.com/apostrophic-lab/merkin>

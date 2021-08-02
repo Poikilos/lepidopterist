@@ -3,7 +3,10 @@
 Define and manage sprites.
 '''
 
-import pygame, random, math
+import pygame
+import random
+import math
+import os
 from pygame.locals import *
 import data, vista, settings
 
@@ -74,9 +77,18 @@ def load():
     frames["leveldisk"] = Frame("level-disk.png", (50, 46))
 
     frames["key-space"] = Frame("key-space.png", (20, 20))
+    frames["key-return"] = Frame("key-return.png", (20, 20))
     frames["key-up"] = Frame("key-up.png", (20, 20))
     frames["key-left"] = Frame("key-left.png", (20, 20))
     frames["key-right"] = Frame("key-right.png", (20, 20))
+
+    button = 1
+    while True:
+        buttonStr = "button-{}".format(button)
+        if not os.path.isfile(buttonStr):
+            break
+        frames[buttonStr] = Frame(buttonStr+".png", (20, 20))
+        button += 1
 
     frames["head-m"] = Frame("head-mortimer.png", (-100,-100))
     frames["head-e"] = Frame("head-elmer.png", (-500,-100))

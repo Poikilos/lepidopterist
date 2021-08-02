@@ -65,4 +65,14 @@ except ValueError:
     lt_is_prevented = True
 assert(lt_is_prevented)
 
+controller1.clearPressed()
+controller1.setKey(K_LEFT, True)
+assert(controller1.getBool("x<0"))
+assert(not controller1.getBool("x>0"))
+
+controller1.clearPressed()
+controller1.setKey(K_RIGHT, True)
+assert(controller1.getBool("x>0"))
+assert(not controller1.getBool("x<0"))
+
 print("All tests passed.")

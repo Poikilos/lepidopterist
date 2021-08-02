@@ -814,6 +814,8 @@ def action(joysticks):
         ceffect.think(dt)
         if not title:
             cdeffect.think(dt)
+        else:
+            print("title: '{}'".format(title))
         if grounded and not cdeffect and not effects and not ending:
             ending = True
             if record.catchamount >= goal:

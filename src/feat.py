@@ -26,13 +26,13 @@ upgradecost["dart"] = (80, 200, 450, 800, 2000)
 upgradecost["roll"] = (200, 500, 2000, 5000, 20000)
 
 keys = {}
-keys["nab"] = ("sp",)
-keys["leap"] = ("up",)
-keys["turn"] = ("back",)
-keys["twirl"] = ("up", "sp")
-keys["bound"] = ("up", "back")
-keys["dart"] = ("up", "forward")
-keys["roll"] = ("forward", "sp")
+keys["nab"] = ("return",)  # formerly ("sp",)
+keys["leap"] = ("sp",)  # formerly ("up",)
+keys["turn"] = ("back",)  # formerly ("back",)
+keys["twirl"] = ("sp", "return")  # formerly ("up", "sp")
+keys["bound"] = ("sp", "back")  # formerly ("up", "back")
+keys["dart"] = ("sp", "forward")  # formerly ("up", "forward")
+keys["roll"] = ("forward", "return")  # formerly ("forward", "sp")
 
 learnat = (0, 2, 4, 6, 8, 10, 999)
 
@@ -96,15 +96,29 @@ def draw(facingright = True, shopping = False):
         if f not in known: continue
         if shopping or not settings.hidefeatnames:
             feateffects[f].draw(img)
-        kmap = dict((("sp", "key-space"), ("up", "key-up"),
+        kmap = dict((("return", "key-return"), ("sp", "key-space"),
                      ("forward", ("key-right" if facingright else "key-left")),
                      ("back", ("key-left" if facingright else "key-right"))))
+        # ^ The values must exist in frames (See sprite.py)
         ks = keys[f]
         if len(ks) == 2:
             sprite.frames[kmap[ks[0]]].place((115 + xoff, 24 + 32 * n + yoff))
             sprite.frames[kmap[ks[1]]].place((142 + xoff, 24 + 32 * n + yoff))
         else:
-            sprite.frames[kmap[ks[0]]].place((128 + xoff, 24 + 32 * n + yoff))
+            try:
+                sprite.frames[kmap[ks[0]]].place((128 + xoff, 24 + 32 * n + yoff))
+            except KeyError as ex:
+                raise KeyError(
+                    "{}\n\n"
+                    " kmap[ks[0]] {} may be missing from"
+                    " frames in sprite.py (ks[0]:{})"
+                    "".format(
+                        ex,
+                        ks[0],  # such as 'return'
+                        kmap[ks[0]],  # such as 'key-return'
+                    )
+                )
+
         for j in range(known[f]):
             if shopping or not settings.hidefeatnames:
                 r = pygame.Rect((160 + 20 * j), (12 + 32 * n), 16, 20)
