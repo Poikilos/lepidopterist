@@ -530,7 +530,7 @@ def action(joysticks):
                     noise.unpause()
                 elif controller1.getBool('SCREENSHOT'):
                     pygame.image.save(vista.screen, "screenshot.png")
-                elif controller1.getBool('EXIT'):
+                elif controller1.getBool('nab'):
                     paused = False
                     noise.unpause()
                 elif controller1.getBool('FULLSCREEN'):
@@ -547,7 +547,7 @@ def action(joysticks):
             else:
                 result = read_event(controller1, event)
 
-            controller_changed = result < 1
+            controller_changed = result > 0
 
             if controller1.getBool('EXIT') and controller_changed:
                 # The same button for exit is also pause.
