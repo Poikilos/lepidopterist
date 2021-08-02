@@ -537,6 +537,7 @@ def action(joysticks):
             vista.screen.blit(pausescreen, (0,0))
             pygame.display.flip()
             continue
+        # action main event loop (when not paused):
         for event in pygame.event.get():
             result = 0
             if event.type == QUIT:
@@ -544,10 +545,11 @@ def action(joysticks):
             else:
                 result = read_event(controller1, event)
 
-            if result < 1:
+            controller_changed = result < 1
+            if not controller_changed:
                 continue
 
-            if controller1.getBool('EXIT'):
+            if controller1.getBool('EXIT') and controller_changed:
                 # The same button for exit is also pause.
                 paused = True
                 noise.pause()
@@ -562,12 +564,12 @@ def action(joysticks):
                 pauseinfo.position(pausescreen)
                 pausetitle.draw(pausescreen)
                 pauseinfo.draw(pausescreen)
-            if controller1.getBool('SCREENSHOT'):
+            if controller1.getBool('SCREENSHOT') and controller_changed:
                 pygame.image.save(vista.screen, "screenshot.png")
-            if controller1.getBool('feat'):
+            if controller1.getBool('feat') and controller_changed:
                 settings.hidefeatnames = not settings.hidefeatnames
                 feat.startlevel(False)
-            if controller1.getBool('FULLSCREEN'):
+            if controller1.getBool('FULLSCREEN') and controller_changed:
                 settings.fullscreen = not settings.fullscreen
                 vista.init()
 
