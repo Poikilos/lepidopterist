@@ -52,9 +52,10 @@ class Effect(object):
         result = ""
         result += str(self)
         result += "; " + str(dir(self))
-        result += "; self.expiring:" + str(self.expiring)
-        result += "; self.age:" + str(self.age)
-        result += "; self.__class__:" + str(self.__class__)
+        result += "; expiring:" + str(self.expiring)
+        result += "; age:" + str(self.age)
+        result += "; __class__:" + str(self.__class__)
+        result += "; texts:" + str(self.texts)
         return result
 
     def render(self):
@@ -101,8 +102,8 @@ class Effect(object):
             print("Error: self._verbose is None")
         if not self.texts:
             return
-        if self._verbose:
-            print("  texts: {}".format(self.texts))
+        # if self._verbose:
+        #     print("  texts: {}".format(self.texts))
         self.age += dt
         if not self.expiring:
             return
@@ -125,6 +126,8 @@ class Effect(object):
         surf.blit(self.image, self.rect)
 
     def __bool__(self):
+        # if self.texts and self._verbose:
+        #         print("self.texts: {}".format(self.texts))
         return bool(self.texts)
 
 class EndEffect(Effect):

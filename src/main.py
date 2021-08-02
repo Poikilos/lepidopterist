@@ -212,7 +212,6 @@ def cutscene():
             print(clock.get_fps())
 
         for event in pygame.event.get():
-            done = False
             result = 0
             if event.type == QUIT:
                 sys.exit()
@@ -224,7 +223,7 @@ def cutscene():
                 continue
 
             if controller1.getBool('EXIT'):
-                done = True
+                return
             elif controller1.getBool('nab') and dticker > 0.4:
                 dialogue = None
             elif controller1.getBool('SCREENSHOT'):
@@ -232,8 +231,6 @@ def cutscene():
             elif controller1.getBool('FULLSCREEN'):
                 settings.fullscreen = not settings.fullscreen
                 vista.init()
-            if done:
-                return
 
         if not dialogue:
             if not dlines: return
@@ -398,13 +395,13 @@ def rollcredits():
 
             if controller1.getBool('EXIT'):
                 return
+            elif controller1.getBool('nab'):
+                credit.advance()
             elif controller1.getBool('SCREENSHOT'):
                 pygame.image.save(vista.screen, "screenshot.png")
             elif controller1.getBool('FULLSCREEN'):
                 settings.fullscreen = not settings.fullscreen
                 vista.init()
-            elif controller1.getBool('nab'):
-                credit.advance()
 
         credit.think(dt)
 
@@ -813,7 +810,7 @@ def action(joysticks):
             e.think(dt)
         effects = [e for e in effects if e]
         ceffect.think(dt)
-        if not titleEffect:
+        if not titleEffect.__bool__():
             cdeffect.think(dt)
         titleEffect.set_verbose(True)
         if prevTitleStr != titleEffect.debug():
