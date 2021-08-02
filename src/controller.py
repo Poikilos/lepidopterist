@@ -69,6 +69,14 @@ class Controller:
         self._sid_to_hat = {}  # reverse map: either axis sid to hatID
         self._inversions = {}  # hat [hatID]: if value is True invert y
 
+    def _raiseIfSidValueBad(self, sid):
+        msg = ("in {} '<' or '>' in sid are not allowed since they are"
+               " used as comparison operators when passed within the"
+               " sid argument of getBool.".format(sid))
+        if '<' in sid:
+            raise ValueError(msg)
+        elif '>' in sid:
+            raise ValueError(msg)
 
     def addKeyAsAxisValue(self, keycode, sid, value):
         '''
@@ -77,6 +85,7 @@ class Controller:
         value -- Set the axis to this value (such as: Make a down
                  arrow key set the axis value to 1)
         '''
+        self._raiseIfSidValueBad(sid)
         try:
             tmp = sid.strip()
         except AttributeError:
@@ -94,6 +103,7 @@ class Controller:
         axisIndex -- an actual joystick axis number
         sid -- Choose a new/existing virtual actuator.
         '''
+        self._raiseIfSidValueBad(sid)
         try:
             tmp = sid.strip()
         except AttributeError:
@@ -102,19 +112,13 @@ class Controller:
         self._sid_to_ax[sid] = axisIndex
         self._states[sid] = 0
 
-    def getTrues(self):
-        results = []
-        for sid, v in self._states.items():
-            if self.getBool(sid):
-                results.append(sid)
-        return results
-
     def addButton(self, button, sid):
         '''
         Sequential arguments:
         button -- an actual joystick button number
         sid -- Choose a new/existing virtual actuator.
         '''
+        self._raiseIfSidValueBad(sid)
         try:
             tmp = sid.strip()
         except AttributeError:
@@ -133,6 +137,7 @@ class Controller:
         keycode -- a hardware keycode
         sid -- Choose a new/existing virtual actuator.
         '''
+        self._raiseIfSidValueBad(sid)
         self._kc_to_sid[str(keycode)] = sid
         if self._sid_to_kcs.get(sid) is None:
             self._sid_to_kcs[sid] = []
@@ -142,6 +147,13 @@ class Controller:
     # endregion initialization
 
     # region runtime
+
+    def getTrues(self):
+        results = []
+        for sid, v in self._states.items():
+            if self.getBool(sid):
+                results.append(sid)
+        return results
 
     def getBool(self, sid):
         '''

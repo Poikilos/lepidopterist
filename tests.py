@@ -10,7 +10,8 @@ assert(controller1.getInt('y') == 0)
 
 controller1.setHat(0, (0, 1))
 assert(controller1.getInt('x') == 0)
-assert(controller1.getInt('y') == 1)
+assert(controller1.getInt('y') == -1)
+# ^ -1 since set invert_y to True when called addHat
 
 controller1.clearPressed()
 controller1.setKey(K_LEFT, True)
@@ -49,5 +50,19 @@ controller1.clearPressed()
 print("controller1.getBool('SCREENSHOT'): {}"
       "".format(controller1.getBool('SCREENSHOT')))
 # ^ a state must exist even before it is pressed.
+
+gt_is_prevented = False
+try:
+    controller1.addKey(1000001, '>')
+except ValueError:
+    gt_is_prevented = True
+assert(gt_is_prevented)
+
+lt_is_prevented = False
+try:
+    controller1.addKey(1000002, '<')
+except ValueError:
+    lt_is_prevented = True
+assert(lt_is_prevented)
 
 print("All tests passed.")
