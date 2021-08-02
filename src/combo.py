@@ -35,8 +35,8 @@ addcombo(('x>0',), "turn-l")  # formerly K_RIGHT
 addcombo(('jump', 'nab'), "twirl")  # formerly (K_UP, K_SPACE)
 addcombo(('x>0', 'nab'), "roll-r")  # formerly (K_RIGHT, K_SPACE)
 addcombo(('x<0', 'nab'), "roll-l")  # formerly (K_LEFT, K_SPACE)
-addcombo(('x>0', 'y<0'), "dart-r")  # formerly (K_RIGHT, K_UP)
-addcombo(('x<0', 'y<0'), "dart-l")  # formerly (K_LEFT, K_UP)
+addcombo(('x>0', 'jump'), "dart-r")  # formerly (K_RIGHT, K_UP)
+addcombo(('x<0', 'jump'), "dart-l")  # formerly (K_LEFT, K_UP)
 # ^ bound and dart are opposites
 #   - See feat.py
 
