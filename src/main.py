@@ -432,16 +432,15 @@ def theend():
             else:
                 result = read_event(controller1, event)
 
-            if result < 1:
-                continue
+            controller_changed = (result >= 2)
 
-            if controller1.getBool('EXIT'):
+            if controller1.getBool('EXIT') and controller_changed:
                 sys.exit()
-            elif controller1.getBool('nab'):
+            elif controller1.getBool('nab') and controller_changed:
                 sys.exit()
-            elif controller1.getBool('SCREENSHOT'):
+            elif controller1.getBool('SCREENSHOT') and controller_changed:
                 pygame.image.save(vista.screen, "screenshot.png")
-            elif controller1.getBool('FULLSCREEN'):
+            elif controller1.getBool('FULLSCREEN') and controller_changed:
                 settings.fullscreen = not settings.fullscreen
                 vista.init()
         vista.screen.fill((0,0,0))
