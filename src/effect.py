@@ -97,10 +97,13 @@ class Effect(object):
 
     def think(self, dt):
         if self._verbose:
-            print("think")
+            print("think (class:{})".format(self.__class__))
         if self._verbose is None:
             print("Error: self._verbose is None")
         if not self.texts:
+            if self._verbose:
+                print("self.texts is {}. self.__bool__ is {}"
+                      "".format(bool(self.texts), self.__bool__()))
             return
         # if self._verbose:
         #     print("  texts: {}".format(self.texts))
@@ -126,8 +129,9 @@ class Effect(object):
         surf.blit(self.image, self.rect)
 
     def __bool__(self):
-        # if self.texts and self._verbose:
-        #         print("self.texts: {}".format(self.texts))
+        if self.texts and self._verbose:
+            print("type {} self.texts: {}"
+                  "".format(self.__class__, self.texts))
         return bool(self.texts)
 
 class EndEffect(Effect):
@@ -152,6 +156,7 @@ class StageNameEffect(Effect):
     fontname0 = "freesansbold"
     color0 = 128, 128, 255
     color1 = 0, 0, 0
+
     def __init__(self, levelnum, goal, timeout):
         levelname = "Stage %s" % levelnum if levelnum < 6 else "Final Stage"
         goaltext = "Get LLL%s in %s seconds" % (goal, timeout)

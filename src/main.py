@@ -546,8 +546,6 @@ def action(joysticks):
                 result = read_event(controller1, event)
 
             controller_changed = result < 1
-            if not controller_changed:
-                continue
 
             if controller1.getBool('EXIT') and controller_changed:
                 # The same button for exit is also pause.
@@ -809,8 +807,15 @@ def action(joysticks):
         feat.think(dt)
         vista.think(dt)
         for b in butterflies: b.think(dt)
+        # seffect.set_verbose(True)
         seffect.think(dt)
-        if not seffect:
+        # if not seffect:  # never occurs :(
+        if not bool(seffect):
+            # ^ __bool__() must be called manually--
+            #   The reason seffect is always True even when is the
+            #   self.texts evaluates to False in the method is unknown.
+            #   Redifining __bool__ in the subclass doesn't help. See
+            #   <https://github.com/poikilos/lepidopterist/issues/12>.
             titleEffect.think(dt)
         for e in effects:
             e.think(dt)
@@ -818,10 +823,10 @@ def action(joysticks):
         ceffect.think(dt)
         if not titleEffect.__bool__():
             cdeffect.think(dt)
-        titleEffect.set_verbose(True)
-        if prevTitleStr != titleEffect.debug():
-            print("titleEffect: '{}'".format(titleEffect.debug()))
-        prevTitleStr = titleEffect.debug()
+        # titleEffect.set_verbose(True)
+        # if prevTitleStr != titleEffect.debug():
+        #     print("titleEffect: '{}'".format(titleEffect.debug()))
+        # prevTitleStr = titleEffect.debug()
         if grounded and not cdeffect and not effects and not ending:
             ending = True
             if record.catchamount >= goal:
