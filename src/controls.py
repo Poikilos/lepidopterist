@@ -35,6 +35,9 @@ from pygame.locals import *
 # - K_RIGHT
 # - K_DOWN: decrease an amount in menu
 
+# DOCUMENTATION: Ensure that the instructions in the "CONTROLS" section
+# of the readme match this file.
+
 # capitalized ones are not related to controlling the character:
 controller1 = Controller()
 controller1.addKeyAsAxisValue(K_LEFT, 'x', -1)

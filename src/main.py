@@ -8,9 +8,9 @@ import datetime
 import data, combo, effect, vista, feat, sprite, settings, record, loadlevel, noise, game
 import time
 from controls import controller1, read_event
+from settings import easy_locked
 
 level = 1
-enable_easy_shortcut = False
 
 def main():
     global level
@@ -110,7 +110,7 @@ def worldmap(joysticks):
                     updateteffect = True
             upValue = controller1.getInt('y') < 0
             downValue = controller1.getInt('y') > 0
-            if (upValue or downValue) and enable_easy_shortcut:
+            if (upValue or downValue) and not easy_locked():
                 udseq.append(0 if upValue else 1)
                 # Activate Easy Mode
                 if len(udseq) >= 8 and tuple(udseq[-8:]) == (0,0,1,1,0,0,1,1) and not settings.easy:

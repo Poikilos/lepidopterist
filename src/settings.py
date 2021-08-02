@@ -4,6 +4,10 @@ Manage settings.
 '''
 import sys
 
+enable_easy_shortcut = False
+def easy_locked():
+    return not enable_easy_shortcut
+
 resolution = 800, 400
 showdots = "--showdots" in sys.argv
 printfps = "--printfps" in sys.argv
@@ -16,6 +20,8 @@ alwaysshow = "--alwaysshow" in sys.argv  # Repeat cutscenes
 hidefeatnames = "--hidefeatnames" in sys.argv
 fullscreen = "--fullscreen" in sys.argv
 easy = "--easy" in sys.argv
+if not enable_easy_shortcut:
+    easy = False
 
 savefile = "savegame"
 for arg in sys.argv:

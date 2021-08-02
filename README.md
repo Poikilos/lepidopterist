@@ -12,35 +12,46 @@ Mortimer the Lepidopterist by Christopher Night (cosmologicon) Winner (Individua
     A score of 100 is good (in about 10 minutes) as a maximum for percentage-based player or team scores if capped at 100.
 
 
-## Requires
+## Run the game
+python3 run_game.py
+- or in Windows, double-click "run_game.pyw" (choose the python location where you installed if it asks to choose a program--See "Requires").
+
+### Requires
 python3 (tested on 2.6.2) and pygame (tested on 1.9.4.post1)
 
-
-## Running the Game
-python run_game.py
-
-
-## CONTROLS:
-Arrow keys + space bar<br/>
-Esc: quit<br/>
-Tab: shrink the heads-up display<br/>
-F: switch between fullscreen and window mode
-
-### Follow the in-game tips.
-Cheat codes (enter on the stage select screen):<br/>
-up up down down up up down down - activate easy mode<br/>
-up down down down down up up up - watch all cut scenes and credits<br/>
-up down up up down up down down - delete the saved game and quit
+Windows:
+- Install [python](https://www.python.org/downloads/)
+  - During install, you must check the option to **add Python to PATH**.
 
 
-## HOW TO PLAY:
+## HOW TO PLAY
 1. Catch butterflies
 2. Earn money
 3. Buy upgrades that give you more abilities
 4. Repeat
 
+Follow the in-game tips.
 
-## COMMAND-LINE OPTIONS:
+### CONTROLS
+(Numbers are gamepad buttons, numbered as labeled on the actual controller--starting with 1. All *italicized* controls are for menus.)
+1. Enter: nab (with net) *or confirm/buy*
+2. Tab: switch between the full and mini heads-up display (feat names)
+3. Space: jump
+4. Backspace: *back*
+5. Esc: pause *or exit*
+6. f: switch between fullscreen and window mode
+7. F12 key: screenshot
+
+Move: Arrow keys + or `a` & `d`<br/>
+
+### Cheat codes
+(enter on the stage select screen; only available if `not easy_locked()`)
+up up down down up up down down - activate easy mode<br/>
+up down down down down up up up - watch all cut scenes and credits<br/>
+up down up up down up down down - delete the saved game and quit
+
+
+## COMMAND-LINE OPTIONS
 * `--nosound`: disable sound effects
 * `--nomusic`: disable music
 * `--fullscreen`: start game in fullscreen mode
@@ -48,24 +59,24 @@ up down up up down up down down - delete the saved game and quit
 * `--restart`: delete the saved game before starting
 * `--alwaysshow`: repeat cutscenes even if you've already seen them
 * `--cheat`: start with all abilities unlocked and maxed out
-* `--easy`: activate easy mode
+* `--easy`: activate easy mode (only available if `not easy_locked()`)
 
-## License
 
-Sprite Artwork and Code were relicensed (formerly below applied):
+## Authors & Licenses
 
+Sprite Artwork and Code were relicensed. Formerly:
 > All code and sprite artwork are original creations of Christopher Night.
 > The copyrights to these are waived with a Creative Commons Zero waiver.
 > They may be freely distributed with no attribution.
 
 -Christopher Night
 
-The licensing for "Sprite Artwork" and "Code" are below under those sections. However, other licenses apply other media (see Media section below).
+The new licensing for "Sprite Artwork" and "Code" are below under those sections. However, other licenses apply other media (see the "Media" section below).
 
 ### Code
 MIT License (see LICENSE file in text editor or at [github.com/poikilos/lepidopterist](https://github.com/poikilos/lepidopterist/blob/master/LICENSE).
 
-Original Pygame.org project page:
+Original Pygame.org project page:<br/>
 <https://www.pygame.org/project-Mortimer+the+Lepidopterist-1696-2949.html><br/>
 
 Entry in PyWeek #11  <http://www.pyweek.org/11/><br/>
