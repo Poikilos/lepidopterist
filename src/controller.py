@@ -13,7 +13,7 @@ _show_controller_stats = False
 def error(msg):
     sys.stderr.write(str(msg)+"\n")
 
-def set_controller_stats(on):
+def set_controllers_verbose(on):
     '''
     Enable all controller messages continuously.
 

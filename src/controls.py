@@ -2,12 +2,10 @@
 
 from controller import (
     Controller,
-    set_controller_stats,
+    set_controllers_verbose,
 )
 from pygame.locals import *
 
-
-set_controller_stats(True)
 
 # desired controls:
 # - The set below allows middle of thumb to press jump and pad of thumb

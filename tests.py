@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from src.controls import controller1
-from src.controller import set_controller_stats
+from src.controller import set_controllers_verbose
 from pygame.locals import *
 
 controller1.setHat(0, (1, 0))
@@ -19,7 +19,7 @@ print("sid for K_LEFT: {}".format(leftSID))
 print("  K_LEFT value: {}".format(controller1._kc_value[str(K_LEFT)]))
 print("  leftSID state: {}".format(controller1._states[leftSID]))
 print("  controller1.getInt('x'): {}".format(controller1.getInt('x')))
-set_controller_stats(True)
+set_controllers_verbose(True)
 assert(controller1.getInt('x') == -1)
 assert(controller1.getInt('y') == 0)
 

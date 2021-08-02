@@ -555,7 +555,7 @@ def action(joysticks):
                 pausescreen.blit(vista.screen,(0,0))
                 pausescreen.blit(fade,(0,0))
                 pausetitle = effect.PauseTitle(["PAUSED"])
-                pauseinfo = effect.PauseInfo(["Press nab to resume|or exit (pause) to exit level"])
+                pauseinfo = effect.PauseInfo(["Press nab to resume|or back to exit level"])
                 pausetitle.position(pausescreen)
                 pauseinfo.position(pausescreen)
                 pausetitle.draw(pausescreen)
@@ -574,7 +574,7 @@ def action(joysticks):
         kcombo = combo.get_combo(controller1)
         # print("PRESSED:{}".format(controller1.getTrues()))
         if grounded:
-            #print("ground combo:{}".format(kcombo))
+            # print("ground combo:{}".format(kcombo))
             dx = 0
             if controller1.getInt('x') > 0:
                 dx += runvx * dt
@@ -647,7 +647,7 @@ def action(joysticks):
                     twirltick = 0
                     noise.play("hop")
         else:
-            #print("air combo:{}".format(kcombo))
+            # print("air combo:{}".format(kcombo))
             if kcombo == "leap" and "leap" in feat.known:
                 if feat.attempt("leap"):
                     vx = leapvx if facingright else -leapvx

@@ -9,7 +9,7 @@ import pygame
 from pygame.locals import *
 from controller import (
     Controller,
-    set_controller_stats,
+    set_controllers_verbose,
 )
 from controls import (
     controller1,
@@ -87,7 +87,6 @@ def get_combo(controller1):
 
 if __name__ == "__main__":
 
-    set_controller_stats(True)
     # Go to a module test mode if the module runs directly.
     pygame.init()
     pygame.joystick.init()
