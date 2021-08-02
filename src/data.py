@@ -1,4 +1,4 @@
-#!/usr/bin/env
+#!/usr/bin/env python3
 '''
 Load data files from the game's "data" directory.
 '''

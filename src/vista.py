@@ -6,6 +6,7 @@ Define the game world model and the screen.
 import pygame, os
 from pygame import *
 import data, settings, loadlevel
+import sys
 
 sx0, sy0 = None, None
 backdrops = {}
@@ -194,7 +195,7 @@ if __name__ == "__main__":
             if any(e.type in (JOYBUTTONDOWN, ) for e in es):
                 break
             if any(e.type == QUIT for e in es):
-                exit()
+                sys.exit()
 
 
 
