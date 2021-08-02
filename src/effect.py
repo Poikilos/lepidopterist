@@ -401,8 +401,8 @@ class ComboBonusIndicator(BonusIndicator):
         self.rect.bottom = surf.get_height() - 50 - int(self.age * 10)
 
 class NabBonusIndicator(BonusIndicator):
-    def __init__(self, amt, xxx_todo_changeme):
-        (x0, y0) = xxx_todo_changeme
+    def __init__(self, amt, pos):
+        (x0, y0) = pos
         BonusIndicator.__init__(self, amt)
         self.x0, self.y0 = x0, y0
     def draw(self, surf):

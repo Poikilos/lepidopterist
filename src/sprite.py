@@ -12,22 +12,22 @@ import data, vista, settings
 
 frames = {}
 class Frame(object):
-    def __init__(self, filename, xxx_todo_changeme, hflip = False):
-        (dx, dy) = xxx_todo_changeme
+    def __init__(self, filename, pos, hflip = False):
+        (dx, dy) = pos
         self.filename = filename
         self.image = pygame.image.load(data.filepath(self.filename)).convert_alpha()
         if hflip:
             self.image = pygame.transform.flip(self.image, True, False)
         self.dx, self.dy = dx, dy
         self.nabbed = False
-    def draw(self, xxx_todo_changeme1):
-        (x, y) = xxx_todo_changeme1
+    def draw(self, pos):
+        (x, y) = pos
         vista.blit(self.image, (x - self.dx, y + self.dy))
         if settings.showdots:
             vista.dot((x, y))
 #        pygame.draw.circle(surf, (255, 128, 0, 255), (int(px), int(py)), 4)
-    def place(self, xxx_todo_changeme2):  # Doesn't use the vista's transformation.
-        (x,y) = xxx_todo_changeme2
+    def place(self, pos):  # Doesn't use the vista's transformation.
+        (x,y) = pos
         vista.screen.blit(self.image, (x - self.dx, y - self.dy))
     def reverse(self):
         return Frame(self.filename, (self.image.get_width() - self.dx, self.dy), True)

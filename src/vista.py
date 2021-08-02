@@ -116,8 +116,8 @@ def constrain(x, y, rx = 0, ry = 0):
     y = max(min(y, vy1 - ry), vy0 + ry)
     return x, y
 
-def position(xxx_todo_changeme, facingright, vy):
-    (x,y) = xxx_todo_changeme
+def position(pos, facingright, vy):
+    (x,y) = pos
     global gx, gy, sx0, sy0
     gx = x - sx/2 + (200 if facingright else -200)
     gy = y - sy/2 + 60
@@ -145,25 +145,25 @@ def clear():
 #    screen.fill((0, 128, 0), pygame.Rect(0, sy - (40 - sy0), 9999, 9999))
     screen.blit(backdrop, (int(0 - sx0), int(sy - (vy1 - sy0))))
 
-def blit(img, xxx_todo_changeme1):
-    (x, y) = xxx_todo_changeme1
+def blit(img, pos):
+    (x, y) = pos
     screen.blit(img, (int(x - sx0), int(sy - (y - sy0))))
 
-def dot(xxx_todo_changeme2):
-    (x, y) = xxx_todo_changeme2
+def dot(pos):
+    (x, y) = pos
     pygame.draw.circle(screen, (255, 128, 0), (int(x - sx0), int(sy - (y - sy0))), 4)
 
-def line(xxx_todo_changeme3, xxx_todo_changeme4, color0=(255, 255, 255), color1=(0,0,0)):
-    (x0, y0) = xxx_todo_changeme3
-    (x1, y1) = xxx_todo_changeme4
+def line(pos1, pos2, color0=(255, 255, 255), color1=(0,0,0)):
+    (x0, y0) = pos1
+    (x1, y1) = pos2
     p0 = (int(x0 - sx0), int(sy - (y0 - sy0)))
     p1 = (int(x1 - sx0), int(sy - (y1 - sy0)))
     pygame.draw.line(screen, color0, p0, p1, 8)
     pygame.draw.line(screen, color1, p0, p1, 4)
 
 
-def circle(xxx_todo_changeme5, r, color=(255,128,0)):
-    (x, y) = xxx_todo_changeme5
+def circle(pos, r, color=(255,128,0)):
+    (x, y) = pos
     pygame.draw.circle(screen, color, (int(x - sx0), int(sy - (y - sy0))), int(r), 1)
 
 
