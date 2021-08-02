@@ -810,7 +810,8 @@ def action(joysticks):
         # seffect.set_verbose(True)
         seffect.think(dt)
         # if not seffect:  # never occurs :(
-        if not bool(seffect):
+        # if not bool(seffect):  # never occurs :(
+        if not seffect.__bool__():
             # ^ __bool__() must be called manually--
             #   The reason seffect is always True even when is the
             #   self.texts evaluates to False in the method is unknown.
