@@ -509,6 +509,10 @@ def action(joysticks):
                     result = read_event(controller1, event)
 
                 if result < 2:
+                    vista.screen.blit(pausescreen, (0,0))
+                    pygame.display.flip()
+                    # Try to prevent a black screen when switching
+                    # away from the game and back.
                     continue
 
                 if controller1.getBool('BACK'):
