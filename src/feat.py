@@ -14,7 +14,7 @@ known["nab"] = 2
 known["leap"] = 1
 
 if settings.cheat:
-    known = dict((f, 6) for f in allfeats)
+    known = dict((featK, 6) for featK in allfeats)
 
 upgradecost = {}
 upgradecost["nab"] = (5, 10, 30, 80, 200)
@@ -48,8 +48,8 @@ def startlevel(fillbars = True):
         if featname in known:
             name = featname
             feateffects[featname] = effect.FeatIndicator(name, len(feateffects))
-    for f in list(feateffects.values()):
-        f.position(vista.screen)
+    for ffx in list(feateffects.values()):
+        ffx.position(vista.screen)
     currentfeattick = 0
 
 def attempt(featname):
@@ -88,19 +88,19 @@ def draw(facingright = True, shopping = False):
             xoff, yoff = 0, 0
 
     if currentfeattick and not settings.hidefeatnames:
-        for n,f in enumerate(allfeats):
-            if f == currentfeat:
+        for n,featK in enumerate(allfeats):
+            if featK == currentfeat:
                 g = random.choice(("glow0", "glow1", "glow2", "glow3"))
-                sprite.frames[g].place((110 - 11*len(f), 25 + 32 * n))
-    for n,f in enumerate(allfeats):
-        if f not in known: continue
+                sprite.frames[g].place((110 - 11*len(featK), 25 + 32 * n))
+    for n,featK in enumerate(allfeats):
+        if featK not in known: continue
         if shopping or not settings.hidefeatnames:
-            feateffects[f].draw(img)
+            feateffects[featK].draw(img)
         kmap = dict((("return", "key-return"), ("sp", "key-space"),
                      ("forward", ("key-right" if facingright else "key-left")),
                      ("back", ("key-left" if facingright else "key-right"))))
         # ^ The values must exist in frames (See sprite.py)
-        ks = keys[f]
+        ks = keys[featK]
         if len(ks) == 2:
             sprite.frames[kmap[ks[0]]].place((115 + xoff, 24 + 32 * n + yoff))
             sprite.frames[kmap[ks[1]]].place((142 + xoff, 24 + 32 * n + yoff))
@@ -119,12 +119,12 @@ def draw(facingright = True, shopping = False):
                     )
                 )
 
-        for j in range(known[f]):
+        for j in range(known[featK]):
             if shopping or not settings.hidefeatnames:
                 r = pygame.Rect((160 + 20 * j), (12 + 32 * n), 16, 20)
             else:
                 r = pygame.Rect((52 + 8 * j), (12 + 32 * n), 8, 20)
-            fill = (255, 0, 0) if j < bars[f] else (0, 0, 0)
+            fill = (255, 0, 0) if j < bars[featK] else (0, 0, 0)
             pygame.draw.rect(img, fill, r)
             pygame.draw.rect(img, (255, 255, 255), r, 2)
     if shopping:
@@ -132,10 +132,10 @@ def draw(facingright = True, shopping = False):
 
 
 def land():
-    for f in known:
-#        if f != "nab":
-            bars[f] = known[f]
-            feattick[f] = 0
+    for featK in known:
+#        if featK != "nab":
+            bars[featK] = known[featK]
+            feattick[featK] = 0
 
 def getupgradecost(featname):
     ucost = upgradecost[featname]

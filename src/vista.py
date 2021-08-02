@@ -182,10 +182,10 @@ if __name__ == "__main__":
     import os
     # dev_data = "dev-data"
     dev_data = data.get_data_dir()
-    for f in sorted(os.listdir(dev_data)):
-        if not f.endswith("jpg"):
+    for sub in sorted(os.listdir(dev_data)):
+        if not sub.endswith("jpg"):
             continue
-        makegrass(os.path.join(dev_data, f))
+        makegrass(os.path.join(dev_data, sub))
         clear()
         pygame.display.flip()
         while True:

@@ -44,6 +44,8 @@ Follow the in-game tips.
 
 Move: Arrow keys + or `a` & `d`<br/>
 
+Note that in the source code the button index is one less than these numbers (gamepad buttons are zero-indexed).
+
 ### Cheat codes
 (enter on the stage select screen; only available if `not easy_locked()`)
 up up down down up up down down - activate easy mode<br/>

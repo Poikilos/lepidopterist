@@ -6,6 +6,7 @@ import pygame, math, random, sys
 from pygame.locals import *
 import datetime
 import data, combo, effect, vista, feat, sprite, settings, record, loadlevel, noise, game
+from effect import is_active
 import time
 from controls import controller1, read_event
 from settings import easy_locked
@@ -155,11 +156,11 @@ def worldmap(joysticks):
         hstext = "high score: LLL%s" % record.hiscore[level] if level in record.hiscore else ""
         hseffect.update(hstext)
         hseffect.position(vista.screen)
-        if esign:
+        if (esign is not None) and is_active(esign):
             esign.think(dt)
-        if rsign:
+        if (rsign is not None) and is_active(rsign):
             rsign.think(dt)
-            if not rsign:
+            if not is_active(rsign):
                 sys.exit()
 
         vista.mapclear()
@@ -174,9 +175,9 @@ def worldmap(joysticks):
 #        speffect.draw(vista.screen)
         hseffect.draw(vista.screen)
         hceffect.draw(vista.screen)
-        if esign:
+        if is_active(esign):
             esign.draw(vista.screen)
-        if rsign:
+        if is_active(rsign):
             rsign.draw(vista.screen)
         pygame.display.flip()
 
@@ -205,7 +206,7 @@ def cutscene():
         pygame.draw.line(background, color,(0,y),(9999,y))
     speaker = None
     dticker = 0
-    while dlines or dialogue:
+    while dlines or is_active(dialogue):
         dt = clock.tick(60) * 0.001
         dticker += dt
         if settings.printfps and random.random() < dt:
@@ -232,9 +233,9 @@ def cutscene():
                 settings.fullscreen = not settings.fullscreen
                 vista.init()
 
-        if not dialogue:
+        if not is_active(dialogue):
             if not dlines: return
-            dticker = 10. if dialogue is None else 0
+            dticker = 10. if (dialogue is None) else 0
             newspeaker, _, line = dlines[0].partition("|")
             dialogue = effect.Dialogue(line, newspeaker)
             if newspeaker != speaker:
@@ -257,7 +258,8 @@ def cutscene():
 
 def showtip():
     alltips = open(data.filepath("tips.txt")).readlines()
-    alltips = [tip[4:] for tip in alltips if int(tip[0]) <= record.unlocked <= int(tip[2])]
+    alltips = [line[4:] for line in alltips if int(line[0]) <= record.unlocked <= int(line[2])]
+    # ^ The characters at 0 and 2 are used to access single-digit numbers.
     tiptext = record.gettip(alltips)
     tip = effect.Tip([tiptext])
     clock = pygame.time.Clock()
@@ -297,7 +299,7 @@ def showtip():
         vista.screen.fill((0,0,0))
         tip.draw(vista.screen)
         pygame.display.flip()
-        if not tip: return
+        if not is_active(tip): return
 
 def shop(joysticks):
     vista.mapinit()
@@ -314,8 +316,8 @@ def shop(joysticks):
     pointer = 0
     nfeat = len(feat.known) + 1
     pointerys = [82 + int(32 * j) for j in list(range(len(feat.known))) + [7.5]]
-    feats = [f for f in feat.allfeats if f in feat.known]
-    pricetags = [effect.CostIndicator(feat.getupgradecost(f), j) for j,f in enumerate(feats)]
+    feats = [featK for featK in feat.allfeats if featK in feat.known]
+    pricetags = [effect.CostIndicator(feat.getupgradecost(featK), j) for j,featK in enumerate(feats)]
     while True:
         dt = clock.tick(60) * 0.001
         if settings.printfps and random.random() < dt:
@@ -377,7 +379,7 @@ def rollcredits():
     clines = open(data.filepath("credits.txt")).readlines()
     credit = effect.Credit(clines)
     clock = pygame.time.Clock()
-    while credit:
+    while is_active(credit):
 
         dt = clock.tick(60) * 0.001
         if settings.printfps and random.random() < dt:
@@ -585,7 +587,7 @@ def action(joysticks):
             if nabtick:
                 dx = 0
 
-            if not cdeffect:
+            if not is_active(cdeffect):
                 dx = 0
                 kcombo = ""
 
@@ -727,7 +729,8 @@ def action(joysticks):
                 combocount = 0
                 feat.land()
                 ach = record.getrecords()
-                if ach: effects.append(effect.AchievementEffect(ach))
+                if ach:
+                    effects.append(effect.AchievementEffect(ach))
                 currentfeat = ""
                 twirltick = 0
                 rolltick = 0
@@ -811,24 +814,24 @@ def action(joysticks):
         seffect.think(dt)
         # if not seffect:  # never occurs :(
         # if not bool(seffect):  # never occurs :(
-        if not seffect.__bool__():
+        if not is_active(seffect):
             # ^ __bool__() must be called manually--
             #   The reason seffect is always True even when is the
             #   self.texts evaluates to False in the method is unknown.
-            #   Redifining __bool__ in the subclass doesn't help. See
+            #   Redefining __bool__ in the subclass doesn't help. See
             #   <https://github.com/poikilos/lepidopterist/issues/12>.
             titleEffect.think(dt)
-        for e in effects:
-            e.think(dt)
-        effects = [e for e in effects if e]
+        for fx in effects:
+            fx.think(dt)
+        effects = [fx for fx in effects if is_active(fx)]
         ceffect.think(dt)
-        if not titleEffect.__bool__():
+        if not is_active(titleEffect):
             cdeffect.think(dt)
         # titleEffect.set_verbose(True)
         # if prevTitleStr != titleEffect.debug():
         #     print("titleEffect: '{}'".format(titleEffect.debug()))
         # prevTitleStr = titleEffect.debug()
-        if grounded and not cdeffect and not effects and not ending:
+        if grounded and not is_active(cdeffect) and not effects and not ending:
             ending = True
             if record.catchamount >= goal:
                 w = ["Stage complete!"]
@@ -846,7 +849,7 @@ def action(joysticks):
                 myfile.write('record.collected='+str(record.collected)+'\n')
             w += feat.checknewfeat(len(record.collected))
             endtitle = effect.EndEffect(w)
-        if ending and endtitle:
+        if ending and is_active(endtitle):
             endtitle.think(dt)
 
 
@@ -861,12 +864,12 @@ def action(joysticks):
         ceffect.draw(vista.screen)
         cdeffect.draw(vista.screen)
         peffect.draw(vista.screen)
-        for e in effects:
-            e.draw(vista.screen)
+        for fx in effects:
+            fx.draw(vista.screen)
         seffect.draw(vista.screen)
-        if not seffect:
+        if not is_active(seffect):
             titleEffect.draw(vista.screen)
-        if ending and endtitle:
+        if ending and is_active(endtitle):
             endtitle.draw(vista.screen)
         pygame.display.flip()
         if not endtitle:

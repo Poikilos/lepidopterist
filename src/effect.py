@@ -8,6 +8,17 @@ import data, vista, noise
 fontcache = {}
 imgcache = {}
 
+
+def is_active(fx):
+    '''
+    This function exists due to an apparent Python bug which makes
+    __bool__() return true when called implicitly. See
+    <https://github.com/poikilos/lepidopterist/issues/15>.
+    '''
+    if fx is None:
+        return False
+    return fx.__bool__()
+
 # Replace "LLL" in effect string with the pounds sign
 def addcurrency(s):
     if "LLL" not in s: return s
