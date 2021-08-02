@@ -64,6 +64,7 @@ class Controller:
 
         self._ax_to_sid = {}  # map joystick [axisIndex] to sid
         self._sid_to_ax = {}  # reverse map: [str(axis)] sid
+        self._axes = {}  # real hardware values for change tracking
 
         self._hat_to_sids = {}  # hat [hatID] values to sids: (sid, sid)
         self._sid_to_hat = {}  # reverse map: either axis sid to hatID
@@ -299,6 +300,31 @@ class Controller:
         self._states[sid] = value
         return True
 
+    def isPastDeadZone(self, value):
+        if value is None:
+            # Maybe someone did _axes.get(unmappedAxisIndex)--that's ok:
+            # The value is stored by setAxis anyway if it was called
+            # even if the axisIndex is not mapped.
+            return False
+        return abs(value) > self.deadZone
+
+    def _getHWAxis(self, axis):
+        '''
+        Get a cached value of the hardware axis (not mapped!) such as
+        for comparison with a not yet set value. Since this is not
+        mapped, only use this method if you know you want the value from
+        a specific axis index.
+
+        Sequential arguments:
+        axis -- the unmapped hardware axis index
+
+        Returns:
+        The cached value of the axis from the last setAxis call that
+        used the same axis index, otherwise None.
+        '''
+        return self._axes.get(str(axis))
+
+
     def setAxis(self, axis, value):
         '''
         Set the value at the sid that you defined by addAxis
@@ -312,16 +338,19 @@ class Controller:
                  that gets a single value.
 
         returns:
-        True if the axis is mapped, otherwise False (The axis will not
-        set anything at all if it is not mapped to some sid)
+        1 if movement goes past the deadzone, 0 if not but the axis is
+        mapped, otherwise -1 if not mapped at all (The axis will not set
+        anything at all if it is not mapped to some sid)
         '''
         this_show_stats = _show_controller_stats
         if _verbose_controller_stats:
             this_show_stats = True
+        self._axes[str(axis)] = value
+        # ^ Save the hardware value even if the index is not mapped.
         sid = self._ax_to_sid.get(str(axis))
         if sid is None:
-            return False
-        if abs(value) > self.deadZone:
+            return -1
+        if self.isPastDeadZone(value):
             try:
                 tmp = float(value)
             except ValueError:
@@ -332,9 +361,10 @@ class Controller:
             if this_show_stats:
                 print("joystick axis {} = {}"
                       "".format(axis, value))
+            return 1
         else:
             self._states[sid] = 0
-        return True
+        return 0  # present but not actuated
 
     def setButton(self, button, on):
         '''
@@ -414,6 +444,8 @@ class Controller:
     def clearPressed(self):
         for sid in self._states.keys():
             self._states[sid] = 0
+        for k in self._axes.keys():
+            self._axes[k] = 0.0
 
 
 # endregion runtime

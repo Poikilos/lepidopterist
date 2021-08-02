@@ -8,7 +8,7 @@ import datetime
 import data, combo, effect, vista, feat, sprite, settings, record, loadlevel, noise, game
 from effect import is_active
 import time
-from controls import controller1, read_event
+from controls import controller1, read_event, last_read_actuator_info
 from settings import easy_locked
 
 level = 1
@@ -94,8 +94,23 @@ def worldmap(joysticks):
             else:
                 result = read_event(controller1, event)
 
-            if result < 1:
+            if result < 2:
+                # ^ 2 is for if hat is being pressed down or the
+                #   analog stick is past the deadZone and wasn't before.
                 continue
+            '''
+            print(
+                "worldmap event result: {}; x:{}; y:{}; pressed:{};"
+                " last_read_actuator_info:{}"
+                "".format(
+                    result,
+                    controller1.getInt('x'),
+                    controller1.getInt('y'),
+                    controller1.getTrues(),
+                    last_read_actuator_info(),
+                )
+            )
+            '''
 
             if controller1.getBool('SCREENSHOT'):
                 pygame.image.save(vista.screen, "screenshot.png")
@@ -220,8 +235,9 @@ def cutscene():
             else:
                 result = read_event(controller1, event)
 
-            if result < 1:
+            if result < 2:
                 continue
+            print("cutscene event result: {}".format(result))
 
             if controller1.getBool('EXIT'):
                 return
@@ -234,7 +250,8 @@ def cutscene():
                 vista.init()
 
         if not is_active(dialogue):
-            if not dlines: return
+            if not dlines:
+                return
             dticker = 10. if (dialogue is None) else 0
             newspeaker, _, line = dlines[0].partition("|")
             dialogue = effect.Dialogue(line, newspeaker)
@@ -331,8 +348,10 @@ def shop(joysticks):
             else:
                 result = read_event(controller1, event)
 
-            if result < 1:
+            if result < 2:
                 continue
+            # print("shop event result: {}; y: {}"
+            #       "".format(result, controller1.getInt('y')))
 
             if controller1.getBool('EXIT'):
                 return
