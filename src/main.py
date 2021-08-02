@@ -485,7 +485,7 @@ def action(joysticks):
     combocount = 0
     grounded = True
     paused = False
-    title = effect.Effect(["READY", "SET", "COLLECT"])
+    titleEffect = effect.Effect(["READY", "SET", "COLLECT"])
     endtitle = True
     ending = False
     effects = []
@@ -496,6 +496,7 @@ def action(joysticks):
     seffect = effect.StageNameEffect(level, goal, timeout)
     feat.startlevel()
     pygame.event.get()
+    prevTitleStr = None
 
     while True:
         dt = clock.tick(60) * 0.001
@@ -807,15 +808,17 @@ def action(joysticks):
         for b in butterflies: b.think(dt)
         seffect.think(dt)
         if not seffect:
-            title.think(dt)
+            titleEffect.think(dt)
         for e in effects:
             e.think(dt)
         effects = [e for e in effects if e]
         ceffect.think(dt)
-        if not title:
+        if not titleEffect:
             cdeffect.think(dt)
-        else:
-            print("title: '{}'".format(title))
+        titleEffect.set_verbose(True)
+        if prevTitleStr != titleEffect.debug():
+            print("titleEffect: '{}'".format(titleEffect.debug()))
+        prevTitleStr = titleEffect.debug()
         if grounded and not cdeffect and not effects and not ending:
             ending = True
             if record.catchamount >= goal:
@@ -853,7 +856,7 @@ def action(joysticks):
             e.draw(vista.screen)
         seffect.draw(vista.screen)
         if not seffect:
-            title.draw(vista.screen)
+            titleEffect.draw(vista.screen)
         if ending and endtitle:
             endtitle.draw(vista.screen)
         pygame.display.flip()

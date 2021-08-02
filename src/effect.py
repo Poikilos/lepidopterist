@@ -26,7 +26,13 @@ class Effect(object):
     color0 = 255, 128, 0
     color1 = 255, 255, 0
     bratio = 32
+    _verbose = False
+
     def __init__(self, texts, fontsize = None, fontname = None):
+        self.expiring = self.__class__.expiring
+        # self._verbose = self.__class__._verbose
+        self.age = 0
+
         if fontsize is None: fontsize = self.fontsize0
         if fontname is None: fontname = self.fontname0
         self.fontsize = fontsize
@@ -38,6 +44,19 @@ class Effect(object):
         self.font = fontcache[key]
         self.texts = list(texts)
         self.render()
+
+    def set_verbose(self, verbose):
+        self._verbose = verbose
+
+    def debug(self):
+        result = ""
+        result += str(self)
+        result += "; " + str(dir(self))
+        result += "; self.expiring:" + str(self.expiring)
+        result += "; self.age:" + str(self.age)
+        result += "; self.__class__:" + str(self.__class__)
+        return result
+
     def render(self):
         key = self.texts[0], self.fontname, self.fontsize, self.color0, self.color1
         if key in imgcache:
@@ -71,24 +90,40 @@ class Effect(object):
             imgcache[key] = self.image
         self.rect = self.image.get_rect()
         self.age = 0
+
     def duration(self, n):
         return 0.5 + 0.05 * n
+
     def think(self, dt):
-        if not self.texts: return
+        if self._verbose:
+            print("think")
+        if self._verbose is None:
+            print("Error: self._verbose is None")
+        if not self.texts:
+            return
+        if self._verbose:
+            print("  texts: {}".format(self.texts))
         self.age += dt
-        if not self.expiring: return
+        if not self.expiring:
+            return
         if self.age > self.duration(len(self.texts[0])):
             self.advance()
+        if self._verbose:
+            print("  age: {}".format(self.age))
+
     def advance(self):
         self.age -= self.duration(len(self.texts[0]))
         del self.texts[0]
         if self.texts: self.render()
+
     def position(self, surf):
         self.rect.center = surf.get_rect().center
+
     def draw(self, surf):
         if not self.texts: return
         self.position(surf)
         surf.blit(self.image, self.rect)
+
     def __bool__(self):
         return bool(self.texts)
 
