@@ -872,7 +872,7 @@ def action(joysticks):
         if ending and is_active(endtitle):
             endtitle.draw(vista.screen)
         pygame.display.flip()
-        if not endtitle:
+        if not is_active(endtitle):
             return
 
 if __name__ == "__main__":

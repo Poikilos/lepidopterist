@@ -15,6 +15,11 @@ def is_active(fx):
     __bool__() return true when called implicitly. See
     <https://github.com/poikilos/lepidopterist/issues/15>.
     '''
+    if fx is True:
+        # ^ endtitle is initially set to True in Lepidopterist rather
+        #   than to an Effect subclass (EndEffect) which it later
+        #   becomes.
+        return True
     if fx is None:
         return False
     return fx.__bool__()
