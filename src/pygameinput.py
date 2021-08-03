@@ -219,8 +219,10 @@ def read_event(thisController, event, pcRect=None, mb_sids=None,
                           "".format(direction))
             elif verbose:
                 print("[read_event] pcRect collide was True")
-        elif verbose:
-            print("[read_event] pcRect was None")
+        else:
+            collide = True
+            if verbose:
+                print("[read_event] collide=True due to pcRect None")
         # ^ Do real collidepoint BEFORE always_collide_mb
         #   so that non-collide situations always set the direction
         #   even though always_collide_mb will also set another button
