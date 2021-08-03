@@ -17,6 +17,15 @@ prevPCKey = None
 level = 1
 down_was_move = False
 
+touchEffect = None
+touchEffectPos = None
+idleColor = (12,45,240,128)
+nabColor = (255,63,63,128)
+jumpColor = (64,192,192,128)
+moveColor = (45,250,12,128)
+whiteColor = (255,255,255,255)
+touchColor = idleColor
+
 def control_format(fmt, thisController):
     return thisController.format(
         fmt,
@@ -25,6 +34,7 @@ def control_format(fmt, thisController):
     )
 
 def main():
+
     global level
     pygame.mixer.pre_init(11025, -16, 2, 256)
     pygame.init()
@@ -40,7 +50,12 @@ def main():
     if record.maxvisited:
         noise.play("girl")
     while True:
-        if record.maxvisited:
+        if settings.startInShop:
+            shop()
+        if settings.startInWorldMap:
+            settings.startInWorldMap = False
+            worldmap()
+        elif record.maxvisited:
             worldmap()
 #            noise.stop()
         if level in (1,4):
@@ -63,7 +78,9 @@ def main():
             rollcredits()
             theend()
         noise.play("girl")
-        shop()
+        if not settings.startInShop:
+            shop()
+        settings.startInShop = False
         game.save()
 
 def less_than_any(left_operand, right_operands):
@@ -74,6 +91,9 @@ def less_than_any(left_operand, right_operands):
 
 def worldmap():
     global level
+    global touchEffect
+    global touchEffectPos
+    global touchColor
     controller1.clearPressed()
     if settings.unlockall:
         record.unlocked = 6
@@ -95,34 +115,55 @@ def worldmap():
     updateteffect = True
     udseq = []
     esign, rsign = None, None
-
+    rectPC = None
+    pcPos = None
     while True:
         dt = clock.tick(60) * 0.001
         if settings.printfps and random.random() < dt:
             print(clock.get_fps())
-        for event in pygame.event.get():
+        events = []
+        if pcPos is not None:
+            # Don't check or discard events until the rect is obtained.
+            events = pygame.event.get()
+        touchText = None
+        for event in events:
             result = 0
             if event.type == QUIT:
                 sys.exit()
                 # ^ This is OK since QUIT already occurred.
             elif event.type == MOUSEBUTTONDOWN:
                 e_x, e_y = event.pos
-                rectPC = sprite.frames["stand"].image.get_rect().move(
-                    levelps[level-1][0],
-                    levelps[level-1][1],
-                )
-                # ^ Player Character
-                if rectPC.collidepoint(e_x, e_y):
+                touchEffectPos = event.pos
+                if pcPos is not None:
+                    preX, preY = pcPos
+                    # ^ Player Character
+                touchColor = idleColor
+                result = 2
+                touchText = "ERROR"
+                if rectPC is None:
+                    result = 0
+                    touchText = "None"
+                    controller1._states['x'] = 0
+                elif rectPC.collidepoint(e_x, e_y):
                     controller1._states['nab'] = 1
-                # elif e_x < levelps[level-1][0]:
+                    touchColor = nabColor
+                    controller1._states['x'] = 0
+                    touchText = "enter"
                 elif e_x < rectPC.centerx:
                     controller1._states['x'] = -1
+                    touchText = "<"
                 else:
                     controller1._states['x'] = 1
-                result = 2
+                    touchText = ">"
+                if settings.visualDebug:
+                    touchEffect = effect.TouchIndicator([touchText], event.pos)
+                else:
+                    touchEffect = None
             else:
                 result = read_event(controller1, event)
-
+            # if touchText is not None:
+            #     touchText = str(result) + ": " + touchText
+            #     print(touchText)
             if result < 2:
                 # ^ 2 is for if hat is being pressed down or the
                 #   analog stick is past the deadZone and wasn't before.
@@ -186,7 +227,8 @@ def worldmap():
                     noise.play("cha-ching")
             if controller1.getBool('nab'):
                 # Enter an area (exit the world map):
-                controller1.clearPressed()
+                print("* exiting world map")
+                controller1._states['x'] = 0
                 return
 
             if controller1.getBool('FULLSCREEN'):
@@ -216,6 +258,14 @@ def worldmap():
         for p in levelps:
             sprite.frames["leveldisk"].draw(p)
         sprite.frames["stand"].draw(levelps[level-1])
+        rectPC = vista.get_frame_screen_rect(
+            sprite.frames["stand"],
+            levelps[level-1],
+            width=sprite.frames["stand"].image.get_rect().width*.7,
+        )
+        pcPos = vista.get_screen_pos(levelps[level-1])
+        # ^ Player Character
+
         teffect.draw(vista.screen)
 #        speffect.draw(vista.screen)
         hseffect.draw(vista.screen)
@@ -224,6 +274,13 @@ def worldmap():
             esign.draw(vista.screen)
         if is_active(rsign):
             rsign.draw(vista.screen)
+        if rectPC is not None:
+            if settings.visualDebug:
+                pygame.draw.rect(vista.screen, idleColor, rectPC)
+        if is_active(touchEffect):
+            # touchEffect.draw(vista.screen, center=touchEffectPos)
+            touchEffect.draw(vista.screen)
+            pygame.draw.circle(vista.screen, touchColor, (touchEffect.x0, touchEffect.y0), 10)
         pygame.display.flip()
 
 def cutscene():
@@ -548,6 +605,9 @@ def action():
     global level
     vista.levelinit(level)
     global prevPCKey
+    global touchEffect
+    global touchEffectPos
+    global touchColor
 
     butterflies, goal, timeout = loadlevel.load(level)
 
@@ -585,6 +645,8 @@ def action():
     feat.startlevel()
     pygame.event.get()
     prevTitleStr = None
+    rectPC = None
+    pcPos = None
 
     while True:
         dt = clock.tick(60) * 0.001
@@ -637,30 +699,53 @@ def action():
                 result = 2
                 e_x, e_y = event.pos
                 # ^ the mouse
-                preX, preY = vista.constrain(x, y, 30)
-                # ^ x,y for the Player Character not the mouse.
-                if prevPCKey is None:
-                    prevPCKey = "stand"
-                rectPC = sprite.frames[prevPCKey].image.get_rect().move(
-                    preX,
-                    preY,
-                )
-                # ^ Player Character
+                # preX, preY = vista.constrain(x, y, 30)
+                if pcPos is not None:
+                    preX, preY = pcPos
+                    # ^ x,y for the Player Character not the mouse.
                 down_was_move = True
-                if rectPC.collidepoint(e_x, e_y):
+                touchText = "."
+                touchEffectPos = event.pos
+                if rectPC is None:
+                    pass
+                elif event.button == 3:  # right
                     down_was_move = False
+                    controller1._states['jump'] = 1
+                    touchText = "^"
+                    touchColor = jumpColor
+                    edgeL = (pcPos[0] - rectPC.width/2)
+                    edgeR = (pcPos[0] + rectPC.width/2)
+                    if not grounded:
+                        # right-click always jumps if in the air already
+                        edgeL = pcPos[0]
+                        edgeR = pcPos[0]
+                    if e_x < edgeL:
+                        controller1._states['x'] = -1
+                    elif e_x > edgeR:
+                        controller1._states['x'] = 1
+                elif rectPC.collidepoint(e_x, e_y):
+                    down_was_move = False
+                    touchColor = idleColor
                     if event.button == 1:  # left
                         controller1._states['nab'] = 1
+                        touchText = '*'
+                        touchColor = nabColor
                     # elif event.button == 2:  # middle
                     #    controller1._states['feat'] = 1
-                    elif event.button == 3:  # right
-                        controller1._states['jump'] = 1
                     else:
                         result = 0
-                elif e_x < rectPC.centerx:
+                elif e_x < pcPos[0]:
                     controller1._states['x'] = -1
+                    touchText = "<"
+                    touchColor = moveColor
                 else:
                     controller1._states['x'] = 1
+                    touchText = ">"
+                    touchColor = moveColor
+                if settings.visualDebug:
+                    touchEffect = effect.TouchIndicator([touchText], event.pos)
+                else:
+                    touchEffect = None
             elif event.type == MOUSEBUTTONUP:
                 result = 1
                 if not down_was_move:
@@ -993,6 +1078,17 @@ def action():
 
         vista.clear()
         sprite.frames[picname].draw((x, y))
+        # ^ draw uses vista so x,y is modifies by camera panning
+        pcPos = vista.get_screen_pos((x, y))
+        if prevPCKey is None:
+            prevPCKey = "stand"
+        rectPC = sprite.frames[prevPCKey].image.get_rect()
+        rectPC.width = rectPC.width * 1.5
+        rectPC.center = pcPos
+        rectPC.height = rectPC.height * .4
+        rectPC.top -= rectPC.height / 2
+        # ^ Player Character
+
         prevPCKey = picname
         for b in butterflies:
             b.draw()
@@ -1010,6 +1106,13 @@ def action():
             titleEffect.draw(vista.screen)
         if ending and is_active(endtitle):
             endtitle.draw(vista.screen)
+        if is_active(touchEffect):
+            if rectPC is not None:
+                if settings.visualDebug:
+                    pygame.draw.rect(vista.screen, idleColor, rectPC)
+                    pygame.draw.circle(vista.screen, whiteColor, (int(pcPos[0]), int(pcPos[1])), 10)
+            touchEffect.draw(vista.screen)
+            pygame.draw.circle(vista.screen, touchColor, (touchEffect.x0, touchEffect.y0), 10)
         pygame.display.flip()
         if not is_active(endtitle):
             return

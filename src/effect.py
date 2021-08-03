@@ -53,9 +53,15 @@ class Effect(object):
         if fontname is None: fontname = self.fontname0
         self.fontsize = fontsize
         self.fontname = fontname
+        if self.fontname is None:
+            print("Error: fontname is {}".format(self.fontname))
+        elif len(self.fontname) < 1:
+            print('Error: fontname is "{}"'.format(self.fontname))
         key = self.fontname, self.fontsize
         if key not in fontcache:
             fpath = data.filepath("%s.ttf" % self.fontname) if self.fontname is not None else None
+            if fpath is None:
+                print('Error: fontname %s.ttf is not present.' % self.fontname)
             fontcache[key] = pygame.font.Font(fpath, self.fontsize)
         self.font = fontcache[key]
         self.texts = list(texts)
@@ -139,9 +145,12 @@ class Effect(object):
     def position(self, surf):
         self.rect.center = surf.get_rect().center
 
-    def draw(self, surf):
+    def draw(self, surf, center=None):
         if not self.texts: return
-        self.position(surf)
+        if center is None:
+            self.position(surf)
+        else:
+            self.rect.center = center
         surf.blit(self.image, self.rect)
 
     def __bool__(self):
@@ -149,6 +158,7 @@ class Effect(object):
             print("type {} self.texts: {}"
                   "".format(self.__class__, self.texts))
         return bool(self.texts)
+
 
 class EndEffect(Effect):
     fontsize0 = 72
@@ -430,6 +440,27 @@ class NabBonusIndicator(BonusIndicator):
         if not self.texts: return
         dx, dy = self.image.get_size()
         vista.blit(self.image, (self.x0 - dx/2, self.y0 + int(self.age*10)))
+
+
+class TouchIndicator(Effect):
+    fontsize0 = 28
+    fontname0 = "freesansbold"
+    # fontname0 = "fightingspirit"  # FIXME: why does this fail?
+    expiring = True
+    color0 = 255, 255, 255
+    color1 = 0, 0, 0
+    bratio = 18
+
+    def __init__(self, texts, pos):
+        (x0, y0) = pos
+        Effect.__init__(self, texts)
+        self.x0, self.y0 = x0, y0
+
+    def draw(self, surf):
+        if not self.texts: return
+        dx, dy = self.image.get_size()
+        vista.blit(self.image, (self.x0 - dx/2, self.y0))
+
 
 class CountdownIndicator(CachedEffect):
     fontname0 = "KoolBean"

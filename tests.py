@@ -95,4 +95,19 @@ with open(os.path.join("data", "tips.txt")) as ins:
         )
         print('keyboard: "{}"'.format(msg))
 
+paleRedA128 = (255,53,53,128)
+# flags = pygame.FULLSCREEN
+flags = 0
+screen = pygame.display.set_mode((800, 450), flags)
+while True:
+    for event in pygame.event.get():
+        if event.type == QUIT:
+            sys.exit()
+        elif event.type == MOUSEBUTTONDOWN:
+            x,y = event.pos
+            pygame.draw.circle(screen, paleRedA128, (x, y), 10)
+            # ^ The alpha is copied to the surface, not used.
+        pygame.display.flip()
+
+
 print("All tests passed.")

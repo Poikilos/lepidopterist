@@ -149,6 +149,33 @@ def blit(img, pos):
     (x, y) = pos
     screen.blit(img, (int(x - sx0), int(sy - (y - sy0))))
 
+def get_screen_pos(pos):
+    (x, y) = pos
+    return (int(x - sx0), int(sy - (y - sy0)))
+
+def get_frame_screen_rect(frame, pos, width=None, foot_ratio=.33):
+    '''
+    Sequential arguments:
+    frame -- a sprite.Frame object
+    pos -- a new center for the object
+    Keyword arguments:
+    foot_ratio -- Set how much of the bottom of the image is the feet.
+                  The rect will be higher (inverse cartesian) by this
+                  number times the height.
+    width -- A new width for the rect,
+             or None for the frame.image.get_rect().width
+    '''
+    rectPC = frame.image.get_rect().move(
+        pos[0],
+        pos[1],
+    )
+    pcPos = get_screen_pos(pos)
+    if width is not None:
+        rectPC.width = width
+    rectPC.center = pcPos
+    rectPC.top -= rectPC.height * foot_ratio
+    return rectPC
+
 def dot(pos):
     (x, y) = pos
     pygame.draw.circle(screen, (255, 128, 0), (int(x - sx0), int(sy - (y - sy0))), 4)

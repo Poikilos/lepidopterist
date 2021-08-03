@@ -4,7 +4,7 @@ Manage settings.
 '''
 import sys
 
-enable_easy_shortcut = False
+enable_easy_shortcut = False  # use from other modules via easy_locked()
 def easy_locked():
     return not enable_easy_shortcut
 
@@ -20,6 +20,9 @@ alwaysshow = "--alwaysshow" in sys.argv  # Repeat cutscenes
 hidefeatnames = "--hidefeatnames" in sys.argv
 fullscreen = "--fullscreen" in sys.argv
 easy = "--easy" in sys.argv
+startInShop = "--start-shop" in sys.argv  # for testing
+startInWorldMap = "--start-worldmap" in sys.argv  # for testing
+visualDebug = "--visual-debug" in sys.argv  # for testing
 if not enable_easy_shortcut:
     easy = False
 
