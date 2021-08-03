@@ -793,18 +793,11 @@ def action():
                 #   always_collide_mb when in the air to allow
                 #   the roll combo using only a mouse but still
                 #   allowing both:
-                #   - nab (this would be impossible if left button
+                #   - nab would be impossible if left button
                 #     were in always_collide_mb--when not, click on
                 #     the character to nab, and click away to dart
-                #     or turn) left click within reach
-                #   - leap: right-click on your character if in the air.
-                #           If on ground, it will always leap.
-                #   - turn ('x') - left-click backward
-                #   - twirl ('nab' and 'jump') - left&right mouse buttons within reach at once
-                #   - dart ('jump' and 'x') - right-click forward
-                #   - bound ('jump' and 'x') - right-click backward
-                #   - roll ('nab' and 'x') - middle-click forward in air (on ground, middle-click walks unless clicking within reach to nab)
-                #   - turn ('x' in opposite direction--no 'jump') in air (on ground, left-click walks unless clicking within reach to nab)
+                #     or turn
+                #   - See "Mouse Controls" in readme.md.
                 # 1: left
                 # 2: middle
                 # 3: right

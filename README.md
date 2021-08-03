@@ -46,6 +46,17 @@ Move: Arrow keys + or `a` & `d`<br/>
 
 Note that in the source code the button index is one less than these numbers (gamepad buttons are zero-indexed).
 
+#### Mouse Controls
+- nab (enter): left click within reach
+- leap (space): right-click on your character if in the air.
+  - If on ground, it will always leap.
+- turn ('x' axis) left-click backward in air (on ground, left-click walks unless clicking within reach to nab)
+- twirl ('nab' and 'leap') - left&right mouse buttons within reach at once
+- dart ('jump' and 'x' axis) - right-click forward
+- bound ('jump' and 'x' axis) - right-click backward
+- roll ('nab' and 'x' axis) - middle-click forward in air (on ground, middle-click walks unless clicking within reach to nab)
+- roll ('nab')
+
 ### Cheat codes
 (enter on the stage select screen; only available if `not easy_locked()`)
 up up down down up up down down - activate easy mode<br/>
