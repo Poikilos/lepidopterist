@@ -14,7 +14,6 @@ from controller import (
 from controls import (
     controller1,
     get_button_if_exists,
-    read_joysticks,
     read_event,
 )
 

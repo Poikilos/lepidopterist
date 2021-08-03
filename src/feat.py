@@ -75,11 +75,13 @@ def think(dt):
     if currentfeattick:
         currentfeattick = max(currentfeattick - dt, 0)
 
+shop_pos = (160, 60)
+
 def draw(facingright = True, shopping = False):
     if shopping:
         img = pygame.surface.Surface((300, 250)).convert_alpha()
         img.fill((0,0,0,0))
-        xoff, yoff = 160, 60
+        xoff, yoff = shop_pos
     else:
         img = vista.screen
         if settings.hidefeatnames:

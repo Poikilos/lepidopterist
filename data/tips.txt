@@ -1,5 +1,5 @@
-1|1|Tip:|Control using the arrows (or a&d)|and enter (1)
-1|2|Tip:|Keys used to perform actions|are shown in the corner:|space (3), left, right and enter (1).
+1|1|Tip:|Move using [x], |jump&nab with [jump]&[nab]
+1|2|Tip:|Keys used to perform actions|are shown in the corner:|[jump], [x] and [nab].
 1|2|Tip:|The bars in the corner tell|you how many times you can|perform an action.
 1|2|Tip:|If you have enough bars, you|can double jump. Just jump|when you're already in the air.
 1|8|Tip:|Your game is automatically|saved whenever you finish|a level.
@@ -12,5 +12,5 @@
 2|4|Tip:|To perform a combo, perform|more than one action in a row|without touching the ground.
 3|4|Tip:|You get bonuses for setting|combo and height records. They|don't add to your level score,|but you can spend them to|upgrade abilities.
 3|8|Tip:|Any combo involving nab| will catch butterflies.
-3|8|Tip:|Press Tab to hide the ability|names in the corner.
+3|8|Tip:|Press [feat] to hide the ability|names in the corner.
 3|8|Tip:|If the time expires while you're|still in the air, you can|continue until you touch the|ground.

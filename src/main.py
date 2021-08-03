@@ -8,10 +8,21 @@ import datetime
 import data, combo, effect, vista, feat, sprite, settings, record, loadlevel, noise, game
 from effect import is_active
 import time
-from controls import controller1, read_event, last_read_actuator_info
+from controls import (controller1, read_event, last_read_actuator_info,
+    gamepad_used,
+)
 from settings import easy_locked
+prevPCKey = None
 
 level = 1
+down_was_move = False
+
+def control_format(fmt, thisController):
+    return thisController.format(
+        fmt,
+        gamepad_used(),
+        keycode_to_str=pygame.key.name,
+    )
 
 def main():
     global level
@@ -30,7 +41,7 @@ def main():
         noise.play("girl")
     while True:
         if record.maxvisited:
-            worldmap(joysticks)
+            worldmap()
 #            noise.stop()
         if level in (1,4):
             noise.play("gnos")
@@ -41,7 +52,7 @@ def main():
         cutscene()
         record.visit(level)
         showtip()
-        action(joysticks)
+        action()
         record.combinemoney()
         game.save()
         if record.unlocked > 6:  # Ending sequence
@@ -52,7 +63,7 @@ def main():
             rollcredits()
             theend()
         noise.play("girl")
-        shop(joysticks)
+        shop()
         game.save()
 
 def less_than_any(left_operand, right_operands):
@@ -61,7 +72,7 @@ def less_than_any(left_operand, right_operands):
             return True
     return False
 
-def worldmap(joysticks):
+def worldmap():
     global level
     controller1.clearPressed()
     if settings.unlockall:
@@ -74,7 +85,9 @@ def worldmap(joysticks):
     levelps = [(150, 90), (250, 130), (350, 110), (450, 150), (550, 130), (650,170)]
     clock = pygame.time.Clock()
     teffect = effect.LevelNameEffect("")
-    speffect = effect.PressSpaceEffect(["Press nab to choose level"])
+    chooseLevelFmt = "Press nab to choose level"
+    chooseLevelStr = control_format(chooseLevelFmt, controller1)
+    speffect = effect.PressSpaceEffect([chooseLevelStr])
     speffect.position(vista.screen)
     hseffect = effect.HighScoreEffect("")
     hceffect = effect.HCRecord([record.gethcrecord()])
@@ -82,6 +95,7 @@ def worldmap(joysticks):
     updateteffect = True
     udseq = []
     esign, rsign = None, None
+
     while True:
         dt = clock.tick(60) * 0.001
         if settings.printfps and random.random() < dt:
@@ -91,6 +105,21 @@ def worldmap(joysticks):
             if event.type == QUIT:
                 sys.exit()
                 # ^ This is OK since QUIT already occurred.
+            elif event.type == MOUSEBUTTONDOWN:
+                e_x, e_y = event.pos
+                rectPC = sprite.frames["stand"].image.get_rect().move(
+                    levelps[level-1][0],
+                    levelps[level-1][1],
+                )
+                # ^ Player Character
+                if rectPC.collidepoint(e_x, e_y):
+                    controller1._states['nab'] = 1
+                # elif e_x < levelps[level-1][0]:
+                elif e_x < rectPC.centerx:
+                    controller1._states['x'] = -1
+                else:
+                    controller1._states['x'] = 1
+                result = 2
             else:
                 result = read_event(controller1, event)
 
@@ -157,6 +186,7 @@ def worldmap(joysticks):
                     noise.play("cha-ching")
             if controller1.getBool('nab'):
                 # Enter an area (exit the world map):
+                controller1.clearPressed()
                 return
 
             if controller1.getBool('FULLSCREEN'):
@@ -232,6 +262,9 @@ def cutscene():
             if event.type == QUIT:
                 sys.exit()
                 # ^ This is OK since QUIT already occurred.
+            elif event.type == MOUSEBUTTONDOWN:
+                controller1._states['nab'] = 1
+                result = 2
             else:
                 result = read_event(controller1, event)
 
@@ -240,6 +273,7 @@ def cutscene():
             print("cutscene event result: {}".format(result))
 
             if controller1.getBool('EXIT'):
+                controller1.clearPressed()
                 return
             elif controller1.getBool('nab') and dticker > 0.4:
                 dialogue = None
@@ -271,10 +305,12 @@ def cutscene():
         sprite.frames["head-%s" % speaker].place((0,0))
         dialogue.draw(vista.screen)
         pygame.display.flip()
-
+    controller1.clearPressed()
 
 def showtip():
     alltips = open(data.filepath("tips.txt")).readlines()
+    for i in range(len(alltips)):
+        alltips[i] = control_format(alltips[i], controller1)
     alltips = [line[4:] for line in alltips if int(line[0]) <= record.unlocked <= int(line[2])]
     # ^ The characters at 0 and 2 are used to access single-digit numbers.
     tiptext = record.gettip(alltips)
@@ -318,11 +354,23 @@ def showtip():
         pygame.display.flip()
         if not is_active(tip): return
 
-def shop(joysticks):
+def shop():
     vista.mapinit()
     feat.startlevel()
     clock = pygame.time.Clock()
-    speffect = effect.PressSpaceEffect(["Press nab to upgrade"])
+    shopHelpFmt = "  [EXIT] |or Choose an upgrade"
+    if gamepad_used():
+        shopHelpFmt += " [nab]"
+    shopHelpStr = controller1.format(
+        shopHelpFmt,
+        gamepad_used(),
+        keycode_to_str=pygame.key.name,
+        add_key_str=False,
+        add_btn_str=False,
+        opening='(',
+        closing=')',
+    )
+    speffect = effect.PressSpaceEffect([shopHelpStr])
     speffect.position(vista.screen)
     ueffect = effect.UpgradeTitle(["Upgrade abilities"])
     ueffect.position(vista.screen)
@@ -343,17 +391,39 @@ def shop(joysticks):
         for event in pygame.event.get():
             buy = False
             result = 0
+            done = False
             if event.type == QUIT:
                 sys.exit()
+            elif event.type == MOUSEBUTTONDOWN:
+                x, y = event.pos
+
+                if deffect.rect.collidepoint(x, y):
+                    # ^ deffect is the ContinueIndicator instance.
+                    # done = True
+                    return
+                else:
+                    for i, featK in enumerate(feats):
+                        tmpFeat = feat.feateffects[featK]
+                        # ^ These rects are near the top left.
+                        #   Instead see `def draw` in the feat module
+                        #   (the shopping boolean is True case).
+                        tmpRect = tmpFeat.rect.move(feat.shop_pos)
+                        if tmpRect.collidepoint(x, y):
+                            pointer = i
+                            buy = True
+                        # else:
+                        #     print("{} is not in {}"
+                        #           "".format((x,y), tmpFeat.rect))
             else:
                 result = read_event(controller1, event)
 
-            if result < 2:
+            if (not buy) and (result < 2):
                 continue
             # print("shop event result: {}; y: {}"
             #       "".format(result, controller1.getInt('y')))
 
             if controller1.getBool('EXIT'):
+                # done = True
                 return
             elif controller1.getBool('SCREENSHOT'):
                 pygame.image.save(vista.screen, "screenshot.png")
@@ -384,7 +454,7 @@ def shop(joysticks):
                     noise.play("cha-ching")
 
         vista.mapclear()
-        feat.draw(shopping = True)
+        feat.draw(shopping=True)
         pygame.draw.circle(vista.screen, (255, 128, 0), (152, pointerys[pointer]), 4)
         if pointer != nfeat - 1:
             speffect.draw(vista.screen)
@@ -469,7 +539,7 @@ def theend():
 
 
 
-def action(joysticks):
+def action():
     '''
     This is part of the gameplay event loop runs when the state is not
     in a menu, cutscene, or other non-gameplay state. However, the
@@ -477,6 +547,7 @@ def action(joysticks):
     '''
     global level
     vista.levelinit(level)
+    global prevPCKey
 
     butterflies, goal, timeout = loadlevel.load(level)
 
@@ -562,6 +633,53 @@ def action(joysticks):
             result = 0
             if event.type == QUIT:
                 sys.exit()
+            elif event.type == MOUSEBUTTONDOWN:
+                result = 2
+                e_x, e_y = event.pos
+                # ^ the mouse
+                preX, preY = vista.constrain(x, y, 30)
+                # ^ x,y for the Player Character not the mouse.
+                if prevPCKey is None:
+                    prevPCKey = "stand"
+                rectPC = sprite.frames[prevPCKey].image.get_rect().move(
+                    preX,
+                    preY,
+                )
+                # ^ Player Character
+                down_was_move = True
+                if rectPC.collidepoint(e_x, e_y):
+                    down_was_move = False
+                    if event.button == 1:  # left
+                        controller1._states['nab'] = 1
+                    # elif event.button == 2:  # middle
+                    #    controller1._states['feat'] = 1
+                    elif event.button == 3:  # right
+                        controller1._states['jump'] = 1
+                    else:
+                        result = 0
+                elif e_x < rectPC.centerx:
+                    controller1._states['x'] = -1
+                else:
+                    controller1._states['x'] = 1
+            elif event.type == MOUSEBUTTONUP:
+                result = 1
+                if not down_was_move:
+                    if event.button == 1:
+                        # left
+                        controller1._states['nab'] = 0
+                    elif event.button == 2:
+                        # middle
+                        controller1._states['feat'] = 0
+                    elif event.button == 3:
+                        # right
+                        controller1._states['jump'] = 0
+                    # 4 scroll up
+                    # 5 scroll down
+                    else:
+                        result = 0
+                else:
+                    controller1._states['x'] = 0
+                    result = 1
             else:
                 result = read_event(controller1, event)
 
@@ -577,7 +695,9 @@ def action(joysticks):
                 pausescreen.blit(vista.screen,(0,0))
                 pausescreen.blit(fade,(0,0))
                 pausetitle = effect.PauseTitle(["PAUSED"])
-                pauseinfo = effect.PauseInfo(["Press nab to resume|or back to exit level"])
+                pauseFmt = "Press [nab] to resume|or [BACK] to exit level"
+                pauseStr = control_format(pauseFmt, controller1)
+                pauseinfo = effect.PauseInfo([pauseStr])
                 pausetitle.position(pausescreen)
                 pauseinfo.position(pausescreen)
                 pausetitle.draw(pausescreen)
@@ -873,6 +993,7 @@ def action(joysticks):
 
         vista.clear()
         sprite.frames[picname].draw((x, y))
+        prevPCKey = picname
         for b in butterflies:
             b.draw()
         if nr is not None and settings.showdots:

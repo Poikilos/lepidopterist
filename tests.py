@@ -1,8 +1,12 @@
 #!/usr/bin/env python
+import os
 
 from src.controls import controller1
 from src.controller import set_controllers_verbose
+import pygame
 from pygame.locals import *
+pygame.init()
+# ^ init to prevent pygame.key.name from always returning "unknown key".
 
 controller1.setHat(0, (1, 0))
 assert(controller1.getInt('x') == 1)
@@ -74,5 +78,21 @@ controller1.clearPressed()
 controller1.setKey(K_RIGHT, True)
 assert(controller1.getBool("x>0"))
 assert(not controller1.getBool("x<0"))
+
+with open(os.path.join("data", "tips.txt")) as ins:
+    for rawL in ins:
+        line = rawL.rstrip("\n\r")
+        msg = controller1.format(
+            line,
+            True,
+            keycode_to_str=pygame.key.name,
+        )
+        print('joystick: "{}"'.format(msg))
+        msg = controller1.format(
+            line,
+            False,
+            keycode_to_str=pygame.key.name,
+        )
+        print('keyboard: "{}"'.format(msg))
 
 print("All tests passed.")

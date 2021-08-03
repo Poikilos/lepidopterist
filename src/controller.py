@@ -13,6 +13,9 @@ _show_controller_stats = False
 def error(msg):
     sys.stderr.write(str(msg)+"\n")
 
+def _keycode_to_str_dummy(keycode):
+    return str(keycode)
+
 def set_controllers_verbose(on):
     '''
     Enable all controller messages continuously.
@@ -51,6 +54,7 @@ class Controller:
 
     def __init__(self):
         self.deadZone = .2
+        self._firstButton = 1
         self._states = {}  # The state of each virtual actuator, usually
                            # -1.0 to 1.0 (or 0 or 1 for buttons, or any
                            # number of keyboard keys can affect it)
@@ -69,6 +73,152 @@ class Controller:
         self._hat_to_sids = {}  # hat [hatID] values to sids: (sid, sid)
         self._sid_to_hat = {}  # reverse map: either axis sid to hatID
         self._inversions = {}  # hat [hatID]: if value is True invert y
+
+
+    def format(self, message, enable_game_controller,
+               keycode_to_str=None, add_key_str=True,
+               add_btn_str=False, opening="", closing=""):
+        '''
+        Use the mappings from this softcontroller.Controller instance to
+        fill in [bracketed] sids in the message, otherwise merely
+        remove the brackets.
+
+        The default _firstButton is 1 (see button_name_if).
+
+        Sequential arguments:
+        message -- Format and return this string.
+        enable_game_controller -- For succinct code, return a key if
+                                  this is False. For example, pass
+                                  controls.gamepad_used() as the value.
+        keycode_to_str -- Optionally provide a callback method to use to
+                          convert a keycode to a key name string, such
+                          as pygame.key.name (call pygame.init() first
+                          or you'll get "unknown key").
+        add_key_str -- Suffix " key" or " keys" after the result when
+                       the result is a key.
+        add_btn_str -- Prefix "button " before the result when the
+                       result is a button.
+        opening -- Prefix it with this if present.
+                   Set it to None for '(' only on buttons, "" for
+                   never.
+        closing -- Suffix it with this if present.
+                   Set it to None for ')' only on buttons, "" for
+                   never.
+        '''
+        if keycode_to_str is None:
+            keycode_to_str = _keycode_to_str_dummy
+        keystr = keycode_to_str
+        btnOpening = opening
+        btnClosing = closing
+        if btnOpening is None:
+            btnOpening = ')'
+            opening = ""
+        if btnClosing is None:
+            btnClosing = ')'
+            closing = ""
+        while True:
+            oBI = message.find('[')  # opening bracket index
+            cBI = -1
+            if oBI >= 0:
+                cBI = message.find(']', oBI)  # closing bracket index
+            if (cBI < 0):
+                return message
+            sid = message[oBI+1:cBI]
+            btnName = self.button_name_if(
+                sid,
+                enable_game_controller,
+                opening=btnOpening,
+                closing=btnClosing,
+                add_btn_str=add_btn_str,
+            )
+            if btnName is None:
+                keycodes = self._sid_to_kcs.get(sid)
+                keycode = None
+                if keycodes is not None:
+                    if len(keycodes) == 1:
+                        keycode = keycodes[0]
+                if keycode is not None:
+                    btnName = keystr(keycode)
+                    if 'unknown' in btnName:
+                        error("Unknown keycode: {}"
+                              " (make sure you call pygame.init first"
+                              " if keycode_to_str is pygame.key.name)"
+                              "".format(keycodes))
+                    if add_key_str:
+                        btnName += " key"
+                elif keycodes is not None:
+                    btnName = '/'.join(keystr(i) for i in keycodes)
+                    if 'unknown' in btnName:
+                        error("Unknown keycodes: {}"
+                              " (make sure you call pygame.init first"
+                              " if keycode_to_str is pygame.key.name)"
+                              "".format('/'.join(str(i) for i in keycodes)))
+                    if add_key_str:
+                        btnName += " keys"
+                else:
+                    error("Warning: there are no keycodes for '{}'"
+                          " in {}".format(sid, self._sid_to_kcs))
+                if btnName is not None:
+                    if opening is not None:
+                        btnName = opening + btnName
+                    if closing is not None:
+                        btnName += closing
+            if btnName is not None:
+                message = message.replace('[' + sid + ']', btnName)
+            else:
+                message = message.replace('[' + sid + ']', sid)
+
+    def button_name_if(self, sid, enable, opening="(", closing=")",
+                       add_btn_str=True):
+        '''
+        The default _firstButton is 1 (button 0 is named "1" and that
+        is what is returned; If the controller's buttons are labeled
+        starting at 0, set _firstButton to 0 first).
+
+        Sequential arguments:
+        sid -- Use this mapped virtual actuator from this controller.
+        enable -- For succinct code, return None if this is False.
+                  For example, pass controls.gamepad_used() as the value.
+        opening -- Prefix the result with this.
+        closing -- Suffix the result with this.
+        add_btn_str -- Prefix the result with this (after opening).
+
+        Returns:
+        an actuator type (axis, button, or hat) then a space then the index,
+        all enclosed by opening&closing, otherwise None if enable is False
+        or the sid is not mapped to anything on this controller.
+        '''
+        if opening is None:
+            opening = ""
+        if closing is None:
+            closing = ""
+        name = None
+        if not enable:
+            return None
+        typeStr = None
+        index = self._sid_to_btn.get(sid)
+        if index is not None:
+            if add_btn_str:
+                typeStr = "button"
+            else:
+                typeStr = None
+        else:
+            index = self._sid_to_ax.get(sid)
+            if index is not None:
+                typeStr = "axis"
+            else:
+                # print("{} is not a button.".format(sid))
+                index = self._sid_to_hat.get(sid)
+                if index is not None:
+                    typeStr = "hat"
+
+        if index is not None:
+            typeStrPrefix = ""
+            indexStr = str(index + self._firstButton)
+            if typeStr is not None:
+                typeStrPrefix = typeStr + " "
+            name = opening + typeStrPrefix + indexStr + closing
+        return name
 
     def _raiseIfSidValueBad(self, sid):
         msg = ("in {} '<' or '>' in sid are not allowed since they are"

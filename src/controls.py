@@ -6,7 +6,6 @@ from controller import (
 )
 from pygame.locals import *
 
-
 # desired controls:
 # - The set below allows middle of thumb to press jump and pad of thumb
 #   to press nab on controllers such as Saitek with the following
@@ -49,7 +48,7 @@ controller1.addKeyAsAxisValue(K_d, 'x', 1)
 controller1.addKeyAsAxisValue(K_w, 'y', -1)
 controller1.addKeyAsAxisValue(K_s, 'y', 1)
 controller1.addKey(K_RETURN, 'nab')  # formerly K_SPACE
-# controller1.addKey(1, Button.FEAT)
+controller1.addKey(K_TAB, 'feat')
 controller1.addKey(K_SPACE, 'jump')  # formerly K_UP; combo is 'leap'
 controller1.addKey(K_BACKSPACE, 'BACK')
 controller1.addKey(K_ESCAPE, 'EXIT')
@@ -69,31 +68,43 @@ controller1.addAxis(1, 'y')  # joystick axis 1 affects dir y
 controller1.addHat(0, ('x', 'y'), True)  # hat 0[0],0[1] affects x,y
 # ^ Down is positive, up is negative (invert hats to match analog axes)
 
+_gamepad_used = False
 
-def read_joysticks(controller, joysticks):
+def gamepad_used():
+    return _gamepad_used
+
+'''
+def read_joysticks(thisController, joysticks):
+    global _gamepad_used
     for joystick in joysticks:
         for i in range(joystick.get_numbuttons()):
-            sid = controller1._btn_to_sid.get(str(i))
+            sid = thisController._btn_to_sid.get(str(i))
             if sid is None:
                 continue
             value = joystick.get_button(i)
-            controller1.setButton(i, value)
+            thisController.setButton(i, value)
+            if value > 0:
+                _gamepad_used = True
         for i in range(joystick.get_numhats()):
-            sids = controller1._hat_to_sids.get(str(i))
+            sids = thisController._hat_to_sids.get(str(i))
             if sids is None:
                 continue
             values = joystick.get_hat(i)
             # sid0, sid1 = sids
-            controller1.setHat(i, values)
+            thisController.setHat(i, values)
         for i in range(joystick.get_numaxes()):
-            sid = controller1._btn_to_sid.get(str(i))
+            sid = thisController._btn_to_sid.get(str(i))
             if sid is None:
                 continue
             value = joystick.get_axis(i)
-            controller1.setAxis(i, value)
+            thisController.setAxis(i, value)
+'''
 
 def get_button_if_exists(joystick, button):
+    global _gamepad_used
     if button < joystick.get_numbuttons():
+        if joystick.get_button(button) > 0:
+            _gamepad_used = True
         return joystick.get_button(button)
     return False
 
@@ -110,6 +121,7 @@ def read_event(thisController, event):
     1 controller changed, 2 if hat down, 3 if button down, 0 if not
     changed (neither up nor down)
     '''
+    global _gamepad_used
     global _last_read_actuator_info
     _last_read_actuator_info = {}
     if event.type == KEYDOWN:
@@ -126,6 +138,7 @@ def read_event(thisController, event):
         _last_read_actuator_info['event.type'] = "JOYBUTTONDOWN"
         _last_read_actuator_info['event.button'] = event.button
         thisController.setButton(event.button, True)
+        _gamepad_used = True
         return 3
     elif event.type == JOYBUTTONUP:
         _last_read_actuator_info['event.type'] = "JOYBUTTONUP"
@@ -141,6 +154,7 @@ def read_event(thisController, event):
         _last_read_actuator_info['event.value'] = event.value
         thisController.setHat(event.hat, event.value)
         if (event.value[0] != 0) or (event.value[1] != 0):
+            _gamepad_used = True
             return 2
         return 1
     elif event.type == JOYAXISMOTION:
@@ -152,6 +166,8 @@ def read_event(thisController, event):
         moved = thisController.setAxis(event.axis, event.value)
         nowValue = thisController._getHWAxis(event.axis)
         nowOut = thisController.isPastDeadZone(nowValue)
+        if nowOut:
+            _gamepad_used = True
         if prevOut is not nowOut:
             print("axis {} changed to {}".format(event.axis, nowOut))
         # else:
