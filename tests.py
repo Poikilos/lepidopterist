@@ -67,7 +67,7 @@ try:
     controller1.addKey(1000002, '<')
 except ValueError:
     lt_is_prevented = True
-assert(lt_is_prevented)
+assert lt_is_prevented
 
 controller1.clearPressed()
 controller1.setKey(K_LEFT, True)

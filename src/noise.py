@@ -3,7 +3,8 @@
 Load and manage sound effects and music.
 '''
 import pygame
-import data, settings
+import data
+import settings
 
 sounds = {}
 songs = {}
@@ -11,6 +12,7 @@ songs["xylo"] = data.filepath("xylophone-symposium.ogg")
 songs["gnos"] = data.filepath("gnossienne1.ogg")
 songs["one"] = data.filepath("one-five-nine.ogg")
 songs["girl"] = data.filepath("another-girl.ogg")
+
 
 def init():
     if not settings.nosound:
@@ -35,6 +37,7 @@ def init():
     if not settings.nomusic:
         pygame.mixer.music.set_volume(0.3)
 
+
 def play(name):
     if name in sounds:
         if settings.nosound: return
@@ -44,9 +47,11 @@ def play(name):
         pygame.mixer.music.load(songs[name])
         pygame.mixer.music.play(-1)
 
+
 def stop():
     if settings.nomusic: return
     pygame.mixer.music.stop()
+
 
 pause = pygame.mixer.music.pause
 unpause = pygame.mixer.music.unpause

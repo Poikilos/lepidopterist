@@ -2,13 +2,29 @@
 '''
 Define and control the game states.
 '''
-import pygame, math, random, sys
+import pygame
+# import math
+import random
+import sys
 from pygame.locals import *
 import datetime
-import data, combo, effect, vista, feat, sprite, settings, record, loadlevel, noise, game
+import data
+import combo
+import effect
+import vista
+import feat
+import sprite
+import settings
+import record
+import loadlevel
+import noise
+import game
 from effect import is_active
 import time
-from controls import (controller1, read_event, last_read_actuator_info,
+from controls import (
+    controller1,
+    read_event,
+    # last_read_actuator_info,
     gamepad_used,
 )
 from settings import easy_locked
@@ -26,12 +42,14 @@ moveColor = (45,250,12,128)
 whiteColor = (255,255,255,255)
 touchColor = idleColor
 
+
 def control_format(fmt, thisController):
     return thisController.format(
         fmt,
         gamepad_used(),
         keycode_to_str=pygame.key.name,
     )
+
 
 def main():
 
@@ -83,11 +101,13 @@ def main():
         settings.startInShop = False
         game.save()
 
+
 def less_than_any(left_operand, right_operands):
     for r in right_operands:
         if left_operand < r:
             return True
     return False
+
 
 def worldmap():
     global level
@@ -283,6 +303,7 @@ def worldmap():
             pygame.draw.circle(vista.screen, touchColor, (touchEffect.x0, touchEffect.y0), 10)
         pygame.display.flip()
 
+
 def cutscene():
     global level
     if record.checkvisited(level) and not (settings.alwaysshow or level == 7):
@@ -292,6 +313,7 @@ def cutscene():
     dialogue = None
     background = pygame.Surface(vista.screen.get_size())
     background.fill((0,0,0))
+
     def drawbackgroundline(y):
         if speaker == "m":
             r = random.randint(0, 144)
@@ -364,6 +386,7 @@ def cutscene():
         pygame.display.flip()
     controller1.clearPressed()
 
+
 def showtip():
     alltips = open(data.filepath("tips.txt")).readlines()
     for i in range(len(alltips)):
@@ -410,6 +433,7 @@ def showtip():
         tip.draw(vista.screen)
         pygame.display.flip()
         if not is_active(tip): return
+
 
 def shop():
     vista.mapinit()
@@ -521,6 +545,7 @@ def shop():
         for tag in pricetags: tag.draw(vista.screen)
         pygame.display.flip()
 
+
 def rollcredits():
     clines = open(data.filepath("credits.txt")).readlines()
     credit = effect.Credit(clines)
@@ -593,7 +618,6 @@ def theend():
         endthing.draw(vista.screen)
         hsthing.draw(vista.screen)
         pygame.display.flip()
-
 
 
 def action():
@@ -1116,6 +1140,7 @@ def action():
         pygame.display.flip()
         if not is_active(endtitle):
             return
+
 
 if __name__ == "__main__":
     print("")

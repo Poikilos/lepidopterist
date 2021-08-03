@@ -3,13 +3,17 @@
 Define the game world model and the screen.
 '''
 
-import pygame, os
+import pygame
+import os
 from pygame import *
-import data, settings, loadlevel
+import data
+import settings
+import loadlevel
 import sys
 
 sx0, sy0 = None, None
 backdrops = {}
+
 
 def init():
     global screen, sx, sy
@@ -18,6 +22,7 @@ def init():
     screen = pygame.display.set_mode((sx, sy), flags)
     pygame.display.set_caption("Mortimer the Lepidopterist")
     pygame.mouse.set_visible(not settings.fullscreen)
+
 
 def makegrass(level):
     global backdrops, backdrop
@@ -102,19 +107,23 @@ def makegrass(level):
     if not enable_test:
         pygame.image.save(backdrop, backdropfile)
 
+
 def levelinit(level):
     global vx0, vx1, vy0, vy1
     vx0, vx1, vy0, vy1 = loadlevel.getbox(level)
     makegrass(level)
 
+
 def mapinit():
     global vx0, vx1, vy0, vy1, sx0, sy0
     vx0, vx1, vy0, vy1, sx0, sy0 = 0, sx, 0, sy, 0, 0
+
 
 def constrain(x, y, rx = 0, ry = 0):
     x = max(min(x, vx1 - rx), vx0 + rx)
     y = max(min(y, vy1 - ry), vy0 + ry)
     return x, y
+
 
 def position(pos, facingright, vy):
     (x,y) = pos
@@ -123,6 +132,7 @@ def position(pos, facingright, vy):
     gy = y - sy/2 + 60
     if sx0 is None:
         sx0, sy0 = gx, gy
+
 
 def think(dt):
     global sx0, sy0
@@ -138,20 +148,25 @@ def think(dt):
     else:
         sy0 = min(max(sy0, vy0), vy1 - sy)
 
+
 def mapclear():
     screen.fill((0, 0, 128))
 
+
 def clear():
-#    screen.fill((0, 128, 0), pygame.Rect(0, sy - (40 - sy0), 9999, 9999))
+    # screen.fill((0, 128, 0), pygame.Rect(0, sy - (40 - sy0), 9999, 9999))
     screen.blit(backdrop, (int(0 - sx0), int(sy - (vy1 - sy0))))
+
 
 def blit(img, pos):
     (x, y) = pos
     screen.blit(img, (int(x - sx0), int(sy - (y - sy0))))
 
+
 def get_screen_pos(pos):
     (x, y) = pos
     return (int(x - sx0), int(sy - (y - sy0)))
+
 
 def get_frame_screen_rect(frame, pos, width=None, foot_ratio=.33):
     '''
@@ -165,20 +180,22 @@ def get_frame_screen_rect(frame, pos, width=None, foot_ratio=.33):
     width -- A new width for the rect,
              or None for the frame.image.get_rect().width
     '''
-    rectPC = frame.image.get_rect().move(
+    result_rect = frame.image.get_rect().move(
         pos[0],
         pos[1],
     )
     pcPos = get_screen_pos(pos)
     if width is not None:
-        rectPC.width = width
-    rectPC.center = pcPos
-    rectPC.top -= rectPC.height * foot_ratio
-    return rectPC
+        result_rect.width = width
+    result_rect.center = pcPos
+    result_rect.top -= result_rect.height * foot_ratio
+    return result_rect
+
 
 def dot(pos):
     (x, y) = pos
     pygame.draw.circle(screen, (255, 128, 0), (int(x - sx0), int(sy - (y - sy0))), 4)
+
 
 def line(pos1, pos2, color0=(255, 255, 255), color1=(0,0,0)):
     (x0, y0) = pos1

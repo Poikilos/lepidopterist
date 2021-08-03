@@ -10,11 +10,14 @@ import sys
 _verbose_controller_stats = False
 _show_controller_stats = False
 
+
 def error(msg):
     sys.stderr.write(str(msg)+"\n")
 
+
 def _keycode_to_str_dummy(keycode):
     return str(keycode)
+
 
 def set_controllers_verbose(on):
     '''
@@ -25,6 +28,7 @@ def set_controllers_verbose(on):
     '''
     global _verbose_controller_stats
     _verbose_controller_stats = on
+
 
 class Controller:
     '''
@@ -73,7 +77,6 @@ class Controller:
         self._hat_to_sids = {}  # hat [hatID] values to sids: (sid, sid)
         self._sid_to_hat = {}  # reverse map: either axis sid to hatID
         self._inversions = {}  # hat [hatID]: if value is True invert y
-
 
     def format(self, message, enable_game_controller,
                keycode_to_str=None, add_key_str=True,
@@ -473,7 +476,6 @@ class Controller:
         used the same axis index, otherwise None.
         '''
         return self._axes.get(str(axis))
-
 
     def setAxis(self, axis, value):
         '''

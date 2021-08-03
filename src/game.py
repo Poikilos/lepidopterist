@@ -2,13 +2,19 @@
 '''
 Manage persistent data.
 '''
-import pickle, os
-import data, feat, record, settings
+import pickle
+import os
+import data
+import feat
+import record
+import settings
+
 
 def save():
     state = feat.known, record.getstate()
     savefile = open(data.basepath("%s.pkl" % settings.savefile), "wb")
     pickle.dump(state, savefile)
+
 
 def load():
     filename = data.basepath("%s.pkl" % settings.savefile)
@@ -18,10 +24,12 @@ def load():
     feat.known, recordstate = pickle.load(savefile)
     record.setstate(recordstate)
 
+
 def remove():
     filename = data.basepath("%s.pkl" % settings.savefile)
     if os.path.exists(filename):
         os.remove(filename)
+
 
 if not settings.restart:
     load()

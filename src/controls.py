@@ -70,8 +70,10 @@ controller1.addHat(0, ('x', 'y'), True)  # hat 0[0],0[1] affects x,y
 
 _gamepad_used = False
 
+
 def gamepad_used():
     return _gamepad_used
+
 
 '''
 def read_joysticks(thisController, joysticks):
@@ -100,6 +102,7 @@ def read_joysticks(thisController, joysticks):
             thisController.setAxis(i, value)
 '''
 
+
 def get_button_if_exists(joystick, button):
     global _gamepad_used
     if button < joystick.get_numbuttons():
@@ -108,10 +111,13 @@ def get_button_if_exists(joystick, button):
         return joystick.get_button(button)
     return False
 
+
 _last_read_actuator_info = {}
+
 
 def last_read_actuator_info():
     return _last_read_actuator_info
+
 
 def read_event(thisController, event):
     '''

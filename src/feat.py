@@ -3,9 +3,13 @@
 Keep track of available feats.
 '''
 
-import pygame, random
+import pygame
+import random
 from pygame.locals import *
-import vista, effect, settings, sprite
+import vista
+import effect
+import settings
+import sprite
 
 allfeats = ("nab", "leap", "turn", "twirl", "bound", "dart", "roll")
 
@@ -35,9 +39,12 @@ keys["dart"] = ("sp", "forward")  # formerly ("up", "forward")
 keys["roll"] = ("forward", "return")  # formerly ("forward", "sp")
 
 learnat = (0, 2, 4, 6, 8, 10, 999)
+shop_pos = (160, 60)
+
 
 def growtime(n, nmax):
     return 2. + 0.5 * (nmax - n)
+
 
 def startlevel(fillbars = True):
     global bars, feattick, feateffects, currentfeattick
@@ -52,6 +59,7 @@ def startlevel(fillbars = True):
         ffx.position(vista.screen)
     currentfeattick = 0
 
+
 def attempt(featname):
     global currentfeat, currentfeattick
     if featname not in known:
@@ -62,6 +70,7 @@ def attempt(featname):
     feattick[featname] = growtime(bars[featname], known[featname])
     currentfeat, currentfeattick = featname, 0.4
     return True
+
 
 def think(dt):
     global currentfeattick
@@ -75,7 +84,6 @@ def think(dt):
     if currentfeattick:
         currentfeattick = max(currentfeattick - dt, 0)
 
-shop_pos = (160, 60)
 
 def draw(facingright = True, shopping = False):
     if shopping:
@@ -135,9 +143,10 @@ def draw(facingright = True, shopping = False):
 
 def land():
     for featK in known:
-#        if featK != "nab":
+        # if featK != "nab":
             bars[featK] = known[featK]
             feattick[featK] = 0
+
 
 def getupgradecost(featname):
     ucost = upgradecost[featname]
@@ -145,6 +154,7 @@ def getupgradecost(featname):
         return 0
     else:
         return ucost[known[featname] - 1]
+
 
 def checknewfeat(ncaught):
     if len(known) >= len(allfeats):

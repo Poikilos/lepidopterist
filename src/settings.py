@@ -5,8 +5,11 @@ Manage settings.
 import sys
 
 enable_easy_shortcut = False  # use from other modules via easy_locked()
+
+
 def easy_locked():
     return not enable_easy_shortcut
+
 
 resolution = 800, 400
 showdots = "--showdots" in sys.argv

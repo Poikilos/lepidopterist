@@ -8,7 +8,9 @@ import random
 import math
 import os
 from pygame.locals import *
-import data, vista, settings
+import data
+import vista
+import settings
 
 frames = {}
 class Frame(object):
@@ -20,17 +22,21 @@ class Frame(object):
             self.image = pygame.transform.flip(self.image, True, False)
         self.dx, self.dy = dx, dy
         self.nabbed = False
+
     def draw(self, pos):
         (x, y) = pos
         vista.blit(self.image, (x - self.dx, y + self.dy))
         if settings.showdots:
             vista.dot((x, y))
-#        pygame.draw.circle(surf, (255, 128, 0, 255), (int(px), int(py)), 4)
+        # pygame.draw.circle(surf, (255, 128, 0, 255), (int(px), int(py)), 4)
+
     def place(self, pos):  # Doesn't use the vista's transformation.
         (x,y) = pos
         vista.screen.blit(self.image, (x - self.dx, y - self.dy))
+
     def reverse(self):
         return Frame(self.filename, (self.image.get_width() - self.dx, self.dy), True)
+
 
 def load():
     frames["stand"] = Frame("you-stand.png", (94, 150))
@@ -109,6 +115,7 @@ class Butterfly(object):
     value = 1
     vx0, vy0 = 100, 20
     flighttime = 0.5
+
     def __init__(self, p = None):
         if p == None:
             self.x = random.uniform(vista.vx0, vista.vx1)
@@ -117,6 +124,7 @@ class Butterfly(object):
             self.x, self.y = p
         self.bangle = None
         self.flaptick = random.random()
+
     def think(self, dt):
         if random.uniform(0, self.flighttime) < dt or self.bangle is None:
             self.bangle = random.uniform(0, 6.28)
@@ -126,10 +134,12 @@ class Butterfly(object):
         self.y += self.vy * dt
         self.y = max(min(self.y, self.ymax), self.ymin)
         self.x, self.y = vista.constrain(self.x, self.y)
+
     def draw(self):
         bpicname = self.fnames[int(self.flaptick / 0.1) % len(self.fnames)]
         if self.vx > 0: bpicname = bpicname + "-b"
         frames[bpicname].draw((self.x, self.y))
+
 
 class BlueButterfly(Butterfly):
     fnames = ("blue0", "blue1")
@@ -139,6 +149,7 @@ class BlueButterfly(Butterfly):
     value = 1
     vx0, vy0 = 100, 20
 
+
 class YellowButterfly(Butterfly):
     name = "ybutterfly"
     fullname = "Homely Swallowtail"
@@ -146,6 +157,7 @@ class YellowButterfly(Butterfly):
     ymin, ymax = 140, 320
     vx0, vy0 = 200, 40
     value = 2
+
 
 class RedButterfly(Butterfly):
     name = "rbutterfly"
@@ -155,6 +167,7 @@ class RedButterfly(Butterfly):
     vx0, vy0 = 300, 60
     value = 4
 
+
 class WhiteButterfly(Butterfly):
     name = "wbutterfly"
     fullname = "Salty Peppered Moth"
@@ -162,6 +175,7 @@ class WhiteButterfly(Butterfly):
     ymin, ymax = 260, 500
     vx0, vy0 = 300, 60
     value = 4
+
 
 class GreyButterfly(Butterfly):
     name = "greybutterfly"
@@ -171,6 +185,7 @@ class GreyButterfly(Butterfly):
     vx0, vy0 = 40, 400
     value = 6
 
+
 class PurpleButterfly(Butterfly):
     name = "pbutterfly"
     fullname = "Splotched Fritillary"
@@ -179,6 +194,7 @@ class PurpleButterfly(Butterfly):
     vx0, vy0 = 300, 60
     value = 4
 
+
 class GreenButterfly(Butterfly):
     name = "gbutterfly"
     fullname = "Rib Tickling Skipper"
@@ -186,6 +202,7 @@ class GreenButterfly(Butterfly):
     ymin, ymax = 60, 500
     vx0, vy0 = 400, 200
     value = 3
+
 
 class BlueFairy(Butterfly):
     fnames = ("fairy-blue",)
@@ -196,6 +213,7 @@ class BlueFairy(Butterfly):
     vx0, vy0 = 600, 200
     flighttime = 0.2
 
+
 class RedFairy(Butterfly):
     fnames = ("fairy-red",)
     ymin, ymax = 400, 600
@@ -204,6 +222,7 @@ class RedFairy(Butterfly):
     value = 12
     vx0, vy0 = 600, 200
     flighttime = 0.2
+
 
 class GreenFairy(Butterfly):
     fnames = ("fairy-green",)

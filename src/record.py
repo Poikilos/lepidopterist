@@ -22,13 +22,16 @@ newcollections = []
 catchamount = 0
 bonusamount = 0
 
+
 def getstate():
     return heightrecord, comborecord, collected, bank, hiscore, unlocked, maxvisited, seentips
+
 
 def setstate(state):
     global heightrecord, comborecord, collected, bank, hiscore, unlocked, maxvisited, seentips
     heightrecord, comborecord, collected, bank, hiscore, unlocked, maxvisited, seentips = state
     unlocked = min(unlocked, 6)
+
 
 def checkheightrecord(h):
     global heightrecord, newheightrecord, bonusamount
@@ -39,6 +42,7 @@ def checkheightrecord(h):
         return int(h)
     return False
 
+
 def checkcomborecord(c):
     global comborecord, newcomborecord, bonusamount
     if int(c) > comborecord:
@@ -47,6 +51,7 @@ def checkcomborecord(c):
         bonusamount += c
         return c
     return False
+
 
 def getrecords():
     global newheightrecord, newcomborecord, newcollections
@@ -60,6 +65,7 @@ def getrecords():
     newcollections = []
     return r
 
+
 def checknab(b):
     global collected, newcollections, catchamount
     catchamount += (3 * b.value if settings.easy else b.value)
@@ -68,6 +74,7 @@ def checknab(b):
     else:
         collected[b.name] = 1
         newcollections.append(b.fullname)
+
 
 def checknabgrounded(b):
     global collected, catchamount
@@ -79,8 +86,11 @@ def checknabgrounded(b):
         collected[b.name] = 1
         return ["You caught a|%s!" % b.fullname]
 
-# Should only be called when a level is actually beaten
+
 def checkhiscore(level):
+    '''
+    Call this only when a level is actually beaten.
+    '''
     global unlocked, hiscore
     unlocked = max(unlocked, level + 1)
     if level not in hiscore or hiscore[level] < catchamount:
@@ -88,8 +98,10 @@ def checkhiscore(level):
         return ["New high score!"]
     return []
 
+
 def gethighscore(level):
     return hiscore[level] if level in hiscore else None
+
 
 def combinemoney():
     global bank, catchamount, bonusamount
@@ -97,12 +109,15 @@ def combinemoney():
     catchamount = 0
     bonusamount = 0
 
+
 def visit(level):
     global maxvisited
     maxvisited = max(maxvisited, level)
 
+
 def checkvisited(level):
     return maxvisited >= level
+
 
 def gettip(alltips):
     global seentips
@@ -111,6 +126,7 @@ def gettip(alltips):
         seentips.add(tips[0])
         return tips[0]
     return random.choice(alltips)
+
 
 def gethcrecord():
     r = []

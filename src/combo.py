@@ -21,10 +21,12 @@ watched = ('jump', 'x<0', 'x>0', 'nab')
 waspressed = dict((k, False) for k in watched)
 combokeys = set()
 combostart = None
-
 combodict = {}
+
+
 def addcombo(keys, name):
     combodict[tuple(sorted(keys))] = name
+
 
 addcombo(('nab',), "nab")  # formerly K_SPACE
 addcombo(('jump',), "leap")  # formerly K_UP

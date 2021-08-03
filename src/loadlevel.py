@@ -4,7 +4,9 @@ Load levels.
 '''
 
 import random
-import sprite, data, settings
+import sprite
+import data
+import settings
 
 levelset = {}
 levelset[1] = dict((
@@ -50,6 +52,7 @@ levelset[6] = dict((
   (sprite.GreenFairy, 8),
 ))
 
+
 def load(level):
     if not 1 <= level <= 6:
         return [], 0, 0
@@ -78,6 +81,7 @@ def load(level):
 
     return butterflies, goal, timeout
 
+
 def newbutterflies(level, dt):
     if not 1 <= level <= 6: return []
     newbs = []
@@ -85,6 +89,7 @@ def newbutterflies(level, dt):
         if random.uniform(0, (60. if settings.easy else 120.)/number) < dt:
             newbs.append(kind())
     return newbs
+
 
 def getbox(level):
     if level == 1:
@@ -101,7 +106,8 @@ def getbox(level):
         return 0, 1000, -40, 2000
     return 0, 1000, -40, 600
 
-def getdialogue(level = ""):
+
+def getdialogue(level=""):
     lines = [line.strip() for line in open(data.filepath("dialogue.txt")) if line.startswith(str(level))]
     return [line.partition("|")[2] for line in lines if line]
 
