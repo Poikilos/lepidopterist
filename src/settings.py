@@ -26,6 +26,8 @@ easy = "--easy" in sys.argv
 startInShop = "--start-shop" in sys.argv  # for testing
 startInWorldMap = "--start-worldmap" in sys.argv  # for testing
 visualDebug = "--visual-debug" in sys.argv  # for testing
+verbose = "--verbose" in sys.argv
+
 if not enable_easy_shortcut:
     easy = False
 

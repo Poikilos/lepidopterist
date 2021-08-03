@@ -23,15 +23,18 @@ from effect import is_active
 import time
 from controls import (
     controller1,
-    read_event,
     # last_read_actuator_info,
     gamepad_used,
 )
+from pygameinput import(
+    read_event,
+    set_verbose,
+)
+set_verbose(settings.verbose)
 from settings import easy_locked
 prevPCKey = None
 
 level = 1
-down_was_move = False
 
 touchEffect = None
 touchEffectPos = None
@@ -135,7 +138,7 @@ def worldmap():
     updateteffect = True
     udseq = []
     esign, rsign = None, None
-    rectPC = None
+    pcRect = None
     pcPos = None
     while True:
         dt = clock.tick(60) * 0.001
@@ -151,36 +154,16 @@ def worldmap():
             if event.type == QUIT:
                 sys.exit()
                 # ^ This is OK since QUIT already occurred.
-            elif event.type == MOUSEBUTTONDOWN:
-                e_x, e_y = event.pos
-                touchEffectPos = event.pos
-                if pcPos is not None:
-                    preX, preY = pcPos
-                    # ^ Player Character
-                touchColor = idleColor
-                result = 2
-                touchText = "ERROR"
-                if rectPC is None:
-                    result = 0
-                    touchText = "None"
-                    controller1._states['x'] = 0
-                elif rectPC.collidepoint(e_x, e_y):
-                    controller1._states['nab'] = 1
-                    touchColor = nabColor
-                    controller1._states['x'] = 0
-                    touchText = "enter"
-                elif e_x < rectPC.centerx:
-                    controller1._states['x'] = -1
-                    touchText = "<"
-                else:
-                    controller1._states['x'] = 1
-                    touchText = ">"
-                if settings.visualDebug:
-                    touchEffect = effect.TouchIndicator([touchText], event.pos)
-                else:
-                    touchEffect = None
             else:
-                result = read_event(controller1, event)
+                # pcRect may be None for a frame but read_event
+                # is ok with that.
+                result = read_event(
+                    controller1,
+                    event,
+                    pcRect=pcRect,
+                    mb_sids=('nab',),
+                    # always_collide_mb=always_collide_mb,
+                )
             # if touchText is not None:
             #     touchText = str(result) + ": " + touchText
             #     print(touchText)
@@ -278,7 +261,7 @@ def worldmap():
         for p in levelps:
             sprite.frames["leveldisk"].draw(p)
         sprite.frames["stand"].draw(levelps[level-1])
-        rectPC = vista.get_frame_screen_rect(
+        pcRect = vista.get_frame_screen_rect(
             sprite.frames["stand"],
             levelps[level-1],
             width=sprite.frames["stand"].image.get_rect().width*.7,
@@ -294,9 +277,9 @@ def worldmap():
             esign.draw(vista.screen)
         if is_active(rsign):
             rsign.draw(vista.screen)
-        if rectPC is not None:
+        if pcRect is not None:
             if settings.visualDebug:
-                pygame.draw.rect(vista.screen, idleColor, rectPC)
+                pygame.draw.rect(vista.screen, idleColor, pcRect)
         if is_active(touchEffect):
             # touchEffect.draw(vista.screen, center=touchEffectPos)
             touchEffect.draw(vista.screen)
@@ -341,11 +324,19 @@ def cutscene():
             if event.type == QUIT:
                 sys.exit()
                 # ^ This is OK since QUIT already occurred.
-            elif event.type == MOUSEBUTTONDOWN:
-                controller1._states['nab'] = 1
-                result = 2
+            # elif event.type == MOUSEBUTTONDOWN:
+            #     controller1._states['nab'] = 1
+            #     result = 2
             else:
-                result = read_event(controller1, event)
+                result = read_event(
+                    controller1,
+                    event,
+                    # pcRect=None, # leave default None--non-directional
+                    mb_sids=('nab', None, 'EXIT'),
+                    # always_collide_mb=2,
+                    # ^ leave default None--non-directional
+                )
+
 
             if result < 2:
                 continue
@@ -408,7 +399,14 @@ def showtip():
                 sys.exit()
                 # ^ This is OK since QUIT already occurred.
             else:
-                result = read_event(controller1, event)
+                result = read_event(
+                    controller1,
+                    event,
+                    # pcRect=None, # leave default None--non-directional
+                    mb_sids=('nab', None, 'EXIT'),
+                    # always_collide_mb=2,
+                    # ^ leave default None--non-directional
+                )
 
             if result < 1:
                 continue
@@ -423,6 +421,8 @@ def showtip():
                 settings.fullscreen = not settings.fullscreen
                 vista.init()
             if done:
+                if settings.verbose:
+                    print("* exiting showtip")
                 vista.screen.fill((0,0,0))
                 pygame.display.flip()
                 return
@@ -496,7 +496,15 @@ def shop():
                         #     print("{} is not in {}"
                         #           "".format((x,y), tmpFeat.rect))
             else:
-                result = read_event(controller1, event)
+                result = read_event(
+                    controller1,
+                    event,
+                    # pcRect=None, # leave default None--non-directional
+                    # mb_sids=('nab', None, 'EXIT'),
+                    # ^ unused in shop since MOUSEBUTTONDOWN is custom
+                    # always_collide_mb=2,
+                    # ^ leave default None--non-directional
+                )
 
             if (not buy) and (result < 2):
                 continue
@@ -561,7 +569,14 @@ def rollcredits():
             if event.type == QUIT:
                 sys.exit()
             else:
-                result = read_event(controller1, event)
+                result = read_event(
+                    controller1,
+                    event,
+                    # pcRect=None, # leave default None--non-directional
+                    mb_sids=('nab', None, 'EXIT'),
+                    # always_collide_mb=2,
+                    # ^ leave default None--non-directional
+                )
 
             if result < 1:
                 continue
@@ -601,7 +616,14 @@ def theend():
             if event.type == QUIT:
                 sys.exit()
             else:
-                result = read_event(controller1, event)
+                result = read_event(
+                    controller1,
+                    event,
+                    # pcRect=None, # leave default None--non-directional
+                    mb_sids=('nab', None, 'EXIT'),
+                    # always_collide_mb=2,
+                    # ^ leave default None--non-directional
+                )
 
             controller_changed = (result >= 2)
 
@@ -669,7 +691,7 @@ def action():
     feat.startlevel()
     pygame.event.get()
     prevTitleStr = None
-    rectPC = None
+    pcRect = None
     pcPos = None
 
     while True:
@@ -683,7 +705,13 @@ def action():
                 if event.type == QUIT:
                     sys.exit()
                 else:
-                    result = read_event(controller1, event)
+                    result = read_event(
+                        controller1,
+                        event,
+                        pcRect=pcRect,
+                        mb_sids=('nab', None, 'BACK'),
+                        # always_collide_mb=2,
+                    )
 
                 if result < 2:
                     vista.screen.blit(pausescreen, (0,0))
@@ -715,82 +743,74 @@ def action():
             pygame.display.flip()
             continue
         # action main event loop (when not paused):
+        up_events = []
         for event in pygame.event.get():
             result = 0
             if event.type == QUIT:
                 sys.exit()
-            elif event.type == MOUSEBUTTONDOWN:
-                result = 2
-                e_x, e_y = event.pos
-                # ^ the mouse
-                # preX, preY = vista.constrain(x, y, 30)
-                if pcPos is not None:
-                    preX, preY = pcPos
-                    # ^ x,y for the Player Character not the mouse.
-                down_was_move = True
-                touchText = "."
-                touchEffectPos = event.pos
-                if rectPC is None:
-                    pass
-                elif event.button == 3:  # right
-                    down_was_move = False
-                    controller1._states['jump'] = 1
-                    touchText = "^"
-                    touchColor = jumpColor
-                    edgeL = (pcPos[0] - rectPC.width/2)
-                    edgeR = (pcPos[0] + rectPC.width/2)
-                    if not grounded:
-                        # right-click always jumps if in the air already
-                        edgeL = pcPos[0]
-                        edgeR = pcPos[0]
-                    if e_x < edgeL:
-                        controller1._states['x'] = -1
-                    elif e_x > edgeR:
-                        controller1._states['x'] = 1
-                elif rectPC.collidepoint(e_x, e_y):
-                    down_was_move = False
-                    touchColor = idleColor
-                    if event.button == 1:  # left
-                        controller1._states['nab'] = 1
-                        touchText = '*'
-                        touchColor = nabColor
-                    # elif event.button == 2:  # middle
-                    #    controller1._states['feat'] = 1
-                    else:
-                        result = 0
-                elif e_x < pcPos[0]:
-                    controller1._states['x'] = -1
-                    touchText = "<"
-                    touchColor = moveColor
-                else:
-                    controller1._states['x'] = 1
-                    touchText = ">"
-                    touchColor = moveColor
-                if settings.visualDebug:
-                    touchEffect = effect.TouchIndicator([touchText], event.pos)
-                else:
-                    touchEffect = None
             elif event.type == MOUSEBUTTONUP:
-                result = 1
-                if not down_was_move:
-                    if event.button == 1:
-                        # left
-                        controller1._states['nab'] = 0
-                    elif event.button == 2:
-                        # middle
-                        controller1._states['feat'] = 0
-                    elif event.button == 3:
-                        # right
-                        controller1._states['jump'] = 0
-                    # 4 scroll up
-                    # 5 scroll down
-                    else:
-                        result = 0
-                else:
-                    controller1._states['x'] = 0
-                    result = 1
+                # Process this separately in case the button was
+                # pressed and released in the same frame such as
+                # with the scroll wheel turning.
+                up_events.append(event)
             else:
-                result = read_event(controller1, event)
+                # pcRect may be None for a frame but read_event
+                # is ok with that.
+                always_collide_mb = None
+                if event.type == MOUSEBUTTONDOWN:
+                    if not grounded:
+                        # Double-jump if in the air
+                        # - 3: Change right-click from 'x' to 'jump'
+                        #      even if not clicking the character
+                        # - 4&5: Change wheel roll to nab to allow roll
+                        #      ('x' and 'nab' at the same time) with
+                        #      only a mouse.
+                        always_collide_mb = (2, 3, 4, 5)
+                    elif (pcRect is not None) and (event.pos[1] < pcRect.top):
+                        # Jump if clicking above the character's head
+                        # even if on the ground and not clicking in
+                        # pcRect.
+                        always_collide_mb = (3)
+                    if settings.verbose:
+                        print("[main.action] pcRect={}"
+                              "".format(pcRect))
+                        if pcRect is not None:
+                            print("[main.action] pcRect.top={}"
+                                  "".format(pcRect.top))
+                        print("[main.action] event.pos={}"
+                              "".format(event.pos))
+                        print("[main.action] always_collide_mb={}"
+                              "".format(always_collide_mb))
+
+                result = read_event(
+                    controller1,
+                    event,
+                    pcRect=pcRect,
+                    mb_sids=('nab', 'nab', 'jump'),
+                    always_collide_mb=always_collide_mb,
+                )
+                # ^ Set the wheel to nab and add 3, 4 & 5 to
+                #   always_collide_mb when in the air to allow
+                #   the roll combo using only a mouse but still
+                #   allowing both:
+                #   - nab (this would be impossible if left button
+                #     were in always_collide_mb--when not, click on
+                #     the character to nab, and click away to dart
+                #     or turn) left click within reach
+                #   - leap: right-click on your character if in the air.
+                #           If on ground, it will always leap.
+                #   - turn ('x') - left-click backward
+                #   - twirl ('nab' and 'jump') - left&right mouse buttons within reach at once
+                #   - dart ('jump' and 'x') - right-click forward
+                #   - bound ('jump' and 'x') - right-click backward
+                #   - roll ('nab' and 'x') - middle-click forward in air (on ground, middle-click walks unless clicking within reach to nab)
+                #   - turn ('x' in opposite direction--no 'jump') in air (on ground, left-click walks unless clicking within reach to nab)
+                # 1: left
+                # 2: middle
+                # 3: right
+                # 4: scroll up
+                # 5: scroll down
+                # ^ The first one in mb_sids is used for button 1.
 
             controller_changed = result > 0
 
@@ -823,6 +843,26 @@ def action():
         # k = pygame.key.get_pressed()
         # k = controller1.toKeys()
         kcombo = combo.get_combo(controller1)
+        if settings.verbose:
+            if (kcombo is not None) and (kcombo != ""):
+                print("[main] kcombo={}".format(kcombo))
+            # else:
+            #     print("[main] controller1._states={}"
+            #           "".format(controller1._states))
+        for event in up_events:
+            # Process these after combos in case down and up were on
+            # the same frame. For further details about
+            # read_event see the first call (this one should match it,
+            # but always_collide_mb doesn't matter on MOUSEBUTTONUP.
+            always_collide_mb = None
+            result = read_event(
+                controller1,
+                event,
+                pcRect=pcRect,
+                mb_sids=('nab', 'nab', 'jump', 'nab', 'nab'),
+                always_collide_mb=always_collide_mb,
+            )
+
         # print("PRESSED:{}".format(controller1.getTrues()))
         if grounded:
             # print("ground combo:{}".format(kcombo))
@@ -1103,17 +1143,28 @@ def action():
         vista.clear()
         sprite.frames[picname].draw((x, y))
         # ^ draw uses vista so x,y is modifies by camera panning
-        pcPos = vista.get_screen_pos((x, y))
+        # Player Character:
         if prevPCKey is None:
             prevPCKey = "stand"
-        rectPC = sprite.frames[prevPCKey].image.get_rect()
-        rectPC.width = rectPC.width * 1.5
-        rectPC.center = pcPos
-        rectPC.height = rectPC.height * .4
-        rectPC.top -= rectPC.height / 2
-        # ^ Player Character
-
+        '''
+        pcPos = vista.get_screen_pos((x, y))
+        pcRect = sprite.frames[prevPCKey].image.get_rect()
+        pcRect.width = pcRect.width * 1.5
+        pcRect.center = pcPos
+        pcRect.height = pcRect.height * .4
+        pcRect.top -= pcRect.height / 2
+        '''
+        pcInternalRect = sprite.frames[prevPCKey].image.get_rect()
+        pcRect = vista.get_frame_screen_rect(
+            sprite.frames[prevPCKey],
+            (x, y),
+            width=pcInternalRect.width*1.5,
+            height=pcInternalRect.height/2,
+        )
+        pcRect.height *= 6
+        # ^ allow clicking below the character for nab
         prevPCKey = picname
+
         for b in butterflies:
             b.draw()
         if nr is not None and settings.showdots:
@@ -1131,9 +1182,9 @@ def action():
         if ending and is_active(endtitle):
             endtitle.draw(vista.screen)
         if is_active(touchEffect):
-            if rectPC is not None:
+            if pcRect is not None:
                 if settings.visualDebug:
-                    pygame.draw.rect(vista.screen, idleColor, rectPC)
+                    pygame.draw.rect(vista.screen, idleColor, pcRect)
                     pygame.draw.circle(vista.screen, whiteColor, (int(pcPos[0]), int(pcPos[1])), 10)
             touchEffect.draw(vista.screen)
             pygame.draw.circle(vista.screen, touchColor, (touchEffect.x0, touchEffect.y0), 10)

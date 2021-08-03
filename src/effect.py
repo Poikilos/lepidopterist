@@ -16,7 +16,7 @@ imgcache = {}
 def is_active(fx):
     '''
     This function exists due to an apparent Python bug which makes
-    __bool__() return true when called implicitly. See
+    __bool__() return True when called implicitly. See
     <https://github.com/poikilos/lepidopterist/issues/15>.
     '''
     if fx is True:

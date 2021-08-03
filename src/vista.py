@@ -168,7 +168,8 @@ def get_screen_pos(pos):
     return (int(x - sx0), int(sy - (y - sy0)))
 
 
-def get_frame_screen_rect(frame, pos, width=None, foot_ratio=.33):
+def get_frame_screen_rect(frame, pos, width=None, height=None,
+                          foot_ratio=.33):
     '''
     Sequential arguments:
     frame -- a sprite.Frame object
@@ -179,6 +180,8 @@ def get_frame_screen_rect(frame, pos, width=None, foot_ratio=.33):
                   number times the height.
     width -- A new width for the rect,
              or None for the frame.image.get_rect().width
+    height -- A new height for the rect,
+              or None for the frame.image.get_rect().height
     '''
     result_rect = frame.image.get_rect().move(
         pos[0],

@@ -6,9 +6,7 @@ Copyright 2021 Jake "Poikilos" Gustafson
 License: MIT License (See <https://github.com/poikilos/SoftController>)
 '''
 import sys
-
-_verbose_controller_stats = False
-_show_controller_stats = False
+import inspect
 
 
 def error(msg):
@@ -19,7 +17,11 @@ def _keycode_to_str_dummy(keycode):
     return str(keycode)
 
 
-def set_controllers_verbose(on):
+_verbose_controller_stats = False
+_show_controller_stats = False
+
+
+def set_controllers_verbose(on):  # set_verbose
     '''
     Enable all controller messages continuously.
 
@@ -52,6 +54,32 @@ class Controller:
     Create the controller(s) in a different file. Call all of the add
     methods on the controller before your program calls any other
     methods on the controller.
+
+    Members:
+    _states -- The state of each virtual actuator is stored
+               here automatically, indexed by sid, usually with values
+               from -1.0 to 1.0 (usually 0 or 1 for buttons, but any
+               number of keyboard keys can set different values on the
+               same sid).
+
+    _last_mb_to_sids -- This is the last sid that the mouse button set
+                       based on conditions such as in pygameinput.py or
+                       another mouse handler.
+
+    _btn_to_sid -- map joystick button [str(num)] to sid
+    _sid_to_btn -- reverse: [str(sid)] = button [str(num)]
+
+    _kc_to_sid -- map keyboard [keycode] to sid
+    _sid_to_kcs -- reverse map: [sid] to multiple keycodes
+    _kc_value -- make the keycode set a specific value
+
+    _ax_to_sid -- map joystick [axisIndex] to sid
+    _sid_to_ax -- reverse map: [str(axis)] sid
+    _axes -- real hardware values for change tracking
+
+    _hat_to_sids -- hat [hatID] values to sids: (sid, sid)
+    _sid_to_hat -- reverse map: either axis sid to hatID
+    _inversions -- hat [hatID]: if value is True invert y
     '''
 
     # region initialization
@@ -59,24 +87,106 @@ class Controller:
     def __init__(self):
         self.deadZone = .2
         self._firstButton = 1
-        self._states = {}  # The state of each virtual actuator, usually
-                           # -1.0 to 1.0 (or 0 or 1 for buttons, or any
-                           # number of keyboard keys can affect it)
+        self._states = {}
 
-        self._btn_to_sid = {}  # map joystick button [str(num)] to sid
-        self._sid_to_btn = {}  # reverse: [str(sid)] = button [str(num)]
+        self._last_mb_to_sids = {}
 
-        self._kc_to_sid = {}  # map keyboard [keycode] to sid
-        self._sid_to_kcs = {}  # reverse map: [sid] to multiple keycodes
-        self._kc_value = {}  # make the keycode set a specific value
+        self._btn_to_sid = {}
+        self._sid_to_btn = {}
 
-        self._ax_to_sid = {}  # map joystick [axisIndex] to sid
-        self._sid_to_ax = {}  # reverse map: [str(axis)] sid
-        self._axes = {}  # real hardware values for change tracking
+        self._kc_to_sid = {}
+        self._sid_to_kcs = {}
+        self._kc_value = {}
 
-        self._hat_to_sids = {}  # hat [hatID] values to sids: (sid, sid)
-        self._sid_to_hat = {}  # reverse map: either axis sid to hatID
-        self._inversions = {}  # hat [hatID]: if value is True invert y
+        self._ax_to_sid = {}
+        self._sid_to_ax = {}
+        self._axes = {}
+
+        self._hat_to_sids = {}
+        self._sid_to_hat = {}
+        self._inversions = {}
+
+    def push_mb_sid(self, index, sid):
+        '''
+        Append the mousebutton to _last_mb_to_sids if not present
+        already.
+        '''
+        key = str(index)
+        if self._last_mb_to_sids.get(key) is None:
+            self._last_mb_to_sids[key] = []
+        if sid not in self._last_mb_to_sids[key]:
+            self._last_mb_to_sids[key].append(sid)
+
+    def peek_mb_sid(self, mb, enable_pop=False, warn=True):
+        '''
+        Get the last sid used for the mouse button but leave it on the
+        stack.
+
+        Sequential arguments:
+        mb -- Use mouse button number sent to push_mb_sid to access it.
+        enable_pop -- Behave as pop (remove the top item even if None).
+        warn -- Warn if the key doesn't exist ("no stack for " mb) or
+                the length is 0 ("There is nothing in " mb).
+        '''
+        # caller = inspect.stack()[1].function
+        # ^ This is Python 3 only stack style--see
+        #   <https://stackoverflow.com/a/900404/4541104>
+        #   and it seems to fail even there:
+        #   AttributeError: 'tuple' has no attribute 'function'
+        #   A commenter says:
+        caller = inspect.currentframe().f_back.f_code.co_name
+
+        msg_prefix = ("[peek_mb_sid via {}] "
+                      "".format(caller))
+        warn_prefix = msg_prefix + "Warning: "
+        key = str(mb)
+        stack = self._last_mb_to_sids.get(key)
+        if stack is None:
+            if _verbose_controller_stats and warn:
+                print(warn_prefix + "There is no stack for {}"
+                      "".format(key))
+            return None
+        if len(stack) < 1:
+            if _verbose_controller_stats and warn:
+                print(warn_prefix + "There is nothing in {}'s stack {}"
+                      "".format(key, stack))
+            return None
+        got = stack[-1]
+        if got is None:
+            if _verbose_controller_stats:
+                print(warn_prefix + "got None from top of {}'s stack {}"
+                      "".format(key, stack))
+        if enable_pop:
+            # The pop functionality is here instead of in pop_mb_sid
+            # since the top item may be None but should still be
+            # removed at this point in the logic.
+            if len(stack) == 1:
+                self._last_mb_to_sids[key] = None
+            else:
+                self._last_mb_to_sids[key] = stack[:-1]
+
+        return got
+
+    def pop_mb_sid(self, mb, warn=True):
+        '''
+        Get and remove the last sid used for the mouse button.
+
+        Sequential arguments:
+        mb -- Use mouse button number sent to push_mb_sid to access it.
+        warn -- Warn if the key doesn't exist ("no stack for " mb) or
+                the length is 0 ("There is nothing in " mb).
+        '''
+        got = self.peek_mb_sid(mb, enable_pop=True, warn=warn)
+        return got
+
+    def clear_mb(self, mb):
+        '''
+        Clear the cache for the mouse button.
+        Sequential arguments:
+        mb -- The mouse button such as 1 for left click or whatever
+              you used when calling push_mb_sid.
+        '''
+        self._last_mb_to_sids[str(mb)] = None
 
     def format(self, message, enable_game_controller,
                keycode_to_str=None, add_key_str=True,
@@ -331,8 +441,8 @@ class Controller:
             sid, r_operand = sid.split('<')
             got = self._states.get(sid)
             if got is None:
-                raise KeyError("{} is not a registered controller sid"
-                               "(operation: {}). _states: {}"
+                raise KeyError("[getBool] Nothing is mapped to sid {}"
+                               " (operation: {}). _states: {}"
                                "".format(sid, old, self._states))
             result = int(got < float(r_operand))
         elif '>' in sid:
@@ -340,8 +450,8 @@ class Controller:
             sid, r_operand = sid.split('>')
             got = self._states.get(sid)
             if got is None:
-                raise KeyError("{} is not a registered controller sid"
-                               "(operation: {}). _states: {}"
+                raise KeyError("[getBool] Nothing is mapped to sid {}"
+                               " (operation: {}). _states: {}"
                                "".format(sid, old, self._states))
             result = int(got > float(r_operand))
 
@@ -356,7 +466,7 @@ class Controller:
                 pass
 
         if got is None:
-            raise KeyError("{} is not a registered controller sid"
+            raise KeyError("[getBool] Nothing is mapped to sid {}"
                            ". _states: {}".format(sid, self._states))
         return result > 0
 
@@ -367,7 +477,7 @@ class Controller:
         '''
         got = self._states.get(sid)
         if got is None:
-            raise KeyError("{} is not a registered controller sid"
+            raise KeyError("[getBool] Nothing is mapped to sid {}"
                            "".format(sid))
         # NOTE: Use _inversions on set, not here on get, since multiple
         #       physical actuators can affect a virtual one.
@@ -386,7 +496,7 @@ class Controller:
             this_show_stats = True
         got = self._states.get(sid)
         if got is None:
-            raise KeyError("{} is not a registered controller sid"
+            raise KeyError("[getInt] Nothing is mapped to sid {}"
                            "".format(sid))
         # NOTE: Use _inversions on set, not here on get, since multiple
         #       physical actuators can affect a virtual one.

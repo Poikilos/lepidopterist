@@ -6,6 +6,9 @@ from controller import (
 )
 from pygame.locals import *
 
+import settings
+set_controllers_verbose(settings.verbose)
+
 # desired controls:
 # - The set below allows middle of thumb to press jump and pad of thumb
 #   to press nab on controllers such as Saitek with the following
@@ -119,78 +122,3 @@ def last_read_actuator_info():
     return _last_read_actuator_info
 
 
-def read_event(thisController, event):
-    '''
-    Update the controller using the event.
-
-    Returns:
-    1 controller changed, 2 if hat down, 3 if button down, 0 if not
-    changed (neither up nor down)
-    '''
-    global _gamepad_used
-    global _last_read_actuator_info
-    _last_read_actuator_info = {}
-    if event.type == KEYDOWN:
-        thisController.setKey(event.key, True)
-        _last_read_actuator_info['event.type'] = "KEYDOWN"
-        _last_read_actuator_info['event.key'] = event.key
-        return 3
-    elif event.type == KEYUP:
-        _last_read_actuator_info['event.type'] = "KEYUP"
-        _last_read_actuator_info['event.key'] = event.key
-        thisController.setKey(event.key, False)
-        return 1
-    elif event.type == JOYBUTTONDOWN:
-        _last_read_actuator_info['event.type'] = "JOYBUTTONDOWN"
-        _last_read_actuator_info['event.button'] = event.button
-        thisController.setButton(event.button, True)
-        _gamepad_used = True
-        return 3
-    elif event.type == JOYBUTTONUP:
-        _last_read_actuator_info['event.type'] = "JOYBUTTONUP"
-        _last_read_actuator_info['event.button'] = event.button
-        thisController.setButton(event.button, False)
-        return 1
-    elif event.type == JOYHATMOTION:
-        # NOTE: joy is deprecated. Use instanceid
-        # (See <https://www.pygame.org/docs/ref/event.html>):
-        # joyI = event.instanceid
-        _last_read_actuator_info['event.type'] = "JOYHATMOTION"
-        _last_read_actuator_info['event.hat'] = event.hat
-        _last_read_actuator_info['event.value'] = event.value
-        thisController.setHat(event.hat, event.value)
-        if (event.value[0] != 0) or (event.value[1] != 0):
-            _gamepad_used = True
-            return 2
-        return 1
-    elif event.type == JOYAXISMOTION:
-        _last_read_actuator_info['event.type'] = "JOYAXISMOTION"
-        _last_read_actuator_info['event.axis'] = event.axis
-        _last_read_actuator_info['event.value'] = event.value
-        prevValue = thisController._getHWAxis(event.axis)
-        prevOut = thisController.isPastDeadZone(prevValue)
-        moved = thisController.setAxis(event.axis, event.value)
-        nowValue = thisController._getHWAxis(event.axis)
-        nowOut = thisController.isPastDeadZone(nowValue)
-        if nowOut:
-            _gamepad_used = True
-        if prevOut is not nowOut:
-            print("axis {} changed to {}".format(event.axis, nowOut))
-        # else:
-        #     print("axis {} was already {} at {} (raw:{})".format(event.axis, nowOut, nowValue, event.value))
-
-        if moved > 0:
-            # The axis moved out of the deadZone.
-            if prevOut is not nowOut:
-                # only return a change if moved and wasn't moved before
-                return 2
-            else:
-                return 1
-        elif moved < 0:
-            # The axis isn't mapped.
-            return 0
-        else:
-            # The movement isn't past the deadZone.
-            return 0
-
-    return 0
