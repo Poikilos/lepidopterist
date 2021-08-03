@@ -6,8 +6,9 @@ import pygame
 # import math
 import random
 import sys
+import os
+from datetime import datetime
 from pygame.locals import *
-import datetime
 import data
 import combo
 import effect
@@ -30,8 +31,10 @@ from pygameinput import(
     read_event,
     set_verbose,
 )
-set_verbose(settings.verbose)
 from settings import easy_locked
+
+
+set_verbose(settings.verbose)
 prevPCKey = None
 
 level = 1
@@ -44,6 +47,45 @@ jumpColor = (64,192,192,128)
 moveColor = (45,250,12,128)
 whiteColor = (255,255,255,255)
 touchColor = idleColor
+
+
+def error(msg):
+    sys.stderr.write("{}\n".msg)
+
+
+def screenshot(screen, path=None, suffix_fmt="_%Y-%m-%d_%H_%M_%S"):
+    '''
+    Save a screenshot.
+
+    Sequential arguments:
+    screen -- a screen (usually vista.screen)
+
+    Keyword arguments:
+    path -- The image filename
+            (If None, then settings.screenshotPath)
+    suffix_fmt -- Add the date using this format before the
+                  extension in path.
+    '''
+    if path is None:
+        path = settings.screenshotPath
+    if path is None:
+        error("Error: the path is None in screenshot.")
+        return
+
+    parts = os.path.splitext(path)
+    suffix = ""
+    if suffix_fmt is not None:
+        suffix = datetime.now().strftime(suffix_fmt)
+        path = parts[0] + suffix + parts[1]
+    existed = False
+    if os.path.isfile(path):
+        existed = True
+    pygame.image.save(screen, path)
+    if existed:
+        # See also: datetime.fromtimestamp(os.path.getctime(path))
+        print('A screenshot was overwritten: "{}"'.format(path))
+    else:
+        print('A screenshot was saved: "{}"'.format(path))
 
 
 def control_format(fmt, thisController):
@@ -186,7 +228,7 @@ def worldmap():
             '''
 
             if controller1.getBool('SCREENSHOT'):
-                pygame.image.save(vista.screen, "screenshot.png")
+                screenshot(vista.screen)
             if controller1.getInt('x') > 0:
                 udseq = []
                 if level < record.unlocked:
@@ -348,7 +390,7 @@ def cutscene():
             elif controller1.getBool('nab') and dticker > 0.4:
                 dialogue = None
             elif controller1.getBool('SCREENSHOT'):
-                pygame.image.save(vista.screen, "screenshot.png")
+                screenshot(vista.screen)
             elif controller1.getBool('FULLSCREEN'):
                 settings.fullscreen = not settings.fullscreen
                 vista.init()
@@ -416,7 +458,7 @@ def showtip():
             elif controller1.getBool('nab'):
                 done = True
             elif controller1.getBool('SCREENSHOT'):
-                pygame.image.save(vista.screen, "screenshot.png")
+                screenshot(vista.screen)
             elif controller1.getBool('FULLSCREEN'):
                 settings.fullscreen = not settings.fullscreen
                 vista.init()
@@ -515,7 +557,7 @@ def shop():
                 # done = True
                 return
             elif controller1.getBool('SCREENSHOT'):
-                pygame.image.save(vista.screen, "screenshot.png")
+                screenshot(vista.screen)
             elif controller1.getBool('FULLSCREEN'):
                 settings.fullscreen = not settings.fullscreen
                 vista.init()
@@ -586,7 +628,7 @@ def rollcredits():
             elif controller1.getBool('nab'):
                 credit.advance()
             elif controller1.getBool('SCREENSHOT'):
-                pygame.image.save(vista.screen, "screenshot.png")
+                screenshot(vista.screen)
             elif controller1.getBool('FULLSCREEN'):
                 settings.fullscreen = not settings.fullscreen
                 vista.init()
@@ -632,7 +674,7 @@ def theend():
             elif controller1.getBool('nab') and controller_changed:
                 sys.exit()
             elif controller1.getBool('SCREENSHOT') and controller_changed:
-                pygame.image.save(vista.screen, "screenshot.png")
+                screenshot(vista.screen)
             elif controller1.getBool('FULLSCREEN') and controller_changed:
                 settings.fullscreen = not settings.fullscreen
                 vista.init()
@@ -732,7 +774,7 @@ def action():
                     paused = False
                     noise.unpause()
                 elif controller1.getBool('SCREENSHOT'):
-                    pygame.image.save(vista.screen, "screenshot.png")
+                    screenshot(vista.screen)
                 elif controller1.getBool('nab'):
                     paused = False
                     noise.unpause()
@@ -825,7 +867,7 @@ def action():
                 pausetitle.draw(pausescreen)
                 pauseinfo.draw(pausescreen)
             if controller1.getBool('SCREENSHOT') and controller_changed:
-                pygame.image.save(vista.screen, "screenshot.png")
+                screenshot(vista.screen)
             if controller1.getBool('feat') and controller_changed:
                 settings.hidefeatnames = not settings.hidefeatnames
                 feat.startlevel(False)
@@ -1122,7 +1164,7 @@ def action():
             else:
                 w = ["Stage incomplete"]
             with open('contestdata.txt','a') as myfile:
-                now = datetime.datetime.now()
+                now = datetime.now()
                 myfile.write(str(now)+'\n')
                 myfile.write('level='+str(level)+'\n')
                 myfile.write('record.catchamount='+str(record.catchamount)+'\n')

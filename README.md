@@ -6,11 +6,14 @@ Mortimer the Lepidopterist by Christopher Night (cosmologicon) Winner (Individua
 
 
 ## Differences in Poikilos' fork
-- Use a gamepad or joystick along with keys (using the MIT Licensed SoftController module: src/controller.py from [github.com/poikilos/SoftController](https://github.com/poikilos/SoftController)).
+- Use a game controller (gamepad or joystick; using the MIT Licensed SoftController module: src/controller.py from [github.com/poikilos/SoftController](https://github.com/poikilos/SoftController)).
+  - Key mapping is available, and appear in the help messages.
+  - The help messages show the button numbers the next time they load after you hit a game controller button.
+- You can do everything using only the mouse.
 - Save the most recent statistics in a machine-readable format.
   - For running contests, collect and clear it (and savegame.pkl) between players manually or using another script.
     A score of 100 is good (in about 10 minutes) as a maximum for percentage-based player or team scores if capped at 100.
-
+- Save screenshots to the user's Pictures directory (or Pictures/Screenshots if exists).
 
 ## Run the game
 python3 run_game.py

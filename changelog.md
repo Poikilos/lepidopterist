@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [git] - 2021-08-03
+### Added
+- Add mouse support for menus and action.
+- Save screenshots in ~/Pictures or ~/Pictures/Screenshots if exists and date the filename.
 
 ## [git] - 2021-08-01
 ### Changed

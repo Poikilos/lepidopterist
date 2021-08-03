@@ -3,6 +3,9 @@
 Manage settings.
 '''
 import sys
+import os
+import platform
+
 
 enable_easy_shortcut = False  # use from other modules via easy_locked()
 
@@ -30,6 +33,58 @@ verbose = "--verbose" in sys.argv
 
 if not enable_easy_shortcut:
     easy = False
+
+
+profile = None
+if platform.system() == "Windows":
+    profile = os.environ.get("USERPROFILE")
+else:
+    profile = os.environ.get("HOME")
+
+picturesPath = None
+if profile is not None:
+    tryPictures = os.path.join(profile, "Pictures")
+    if os.path.isdir(tryPictures):
+        picturesPath = tryPictures
+        if verbose:
+            print('detected Pictures="{}"'.format(picturesPath))
+    else:
+        picturesPath = profile
+        if verbose:
+            print('There is no "{}" so Pictures="{}"'
+                  ''.format(tryPictures, picturesPath))
+else:
+    if verbose:
+        print('There is no profile so Pictures="{}"'
+              ''.format(picturesPath))
+
+screenshotsPath = picturesPath
+if picturesPath is not None:
+    tryScreenshots = os.path.join(picturesPath, "Screenshots")
+    if os.path.isdir(tryScreenshots):
+        screenshotsPath = tryScreenshots
+        if verbose:
+            print('detected Screenshots="{}"'.format(picturesPath))
+    else:
+        screenshotsPath = picturesPath
+        if verbose:
+            print('There is no "{}" so Screenshots="{}"'
+                  ''.format(tryScreenshots, screenshotsPath))
+else:
+    if verbose:
+        print('There is no ~/Pictures/Screenshots nor profile'
+              ' so Screenshots="{}"'
+              ''.format(screenshotsPath))
+
+
+screenshotName = "screenshot-lepidopterist.png"
+screenshotPath = screenshotName
+if screenshotsPath is not None:
+    screenshotPath = os.path.join(screenshotsPath, screenshotName)
+
+print("screenshotPath: {}".format(screenshotPath))
+
+
 
 savefile = "savegame"
 for arg in sys.argv:
