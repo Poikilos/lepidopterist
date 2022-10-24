@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 
-from controller import (
+from .controller import (
     Controller,
     set_controllers_verbose,
 )
 from pygame.locals import *
 
-import settings
+from . import settings
 set_controllers_verbose(settings.verbose)
 
 # desired controls:

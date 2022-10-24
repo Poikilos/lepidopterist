@@ -8,9 +8,9 @@ import random
 import math
 import os
 from pygame.locals import *
-import data
-import vista
-import settings
+from . import data
+from . import vista
+from . import settings
 
 frames = {}
 class Frame(object):

@@ -6,9 +6,9 @@ Define the game world model and the screen.
 import pygame
 import os
 from pygame import *
-import data
-import settings
-import loadlevel
+from . import data
+from . import settings
+from . import loadlevel
 import sys
 
 sx0, sy0 = None, None

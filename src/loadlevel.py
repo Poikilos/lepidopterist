@@ -4,9 +4,9 @@ Load levels.
 '''
 
 import random
-import sprite
-import data
-import settings
+from . import sprite
+from . import data
+from . import settings
 
 levelset = {}
 levelset[1] = dict((

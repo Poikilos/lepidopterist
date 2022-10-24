@@ -7,15 +7,15 @@ The rule is: two keys are a combo.
 import sys
 import pygame
 from pygame.locals import *
-from controller import (
+from .controller import (
     Controller,
     set_controllers_verbose,
 )
-from controls import (
+from .controls import (
     controller1,
     get_button_if_exists,
 )
-from pygameinput import(
+from .pygameinput import(
     read_event,
 )
 

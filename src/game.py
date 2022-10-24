@@ -4,10 +4,10 @@ Manage persistent data.
 '''
 import pickle
 import os
-import data
-import feat
-import record
-import settings
+from . import data
+from . import feat
+from . import record
+from . import settings
 
 
 def save():

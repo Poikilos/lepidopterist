@@ -6,10 +6,10 @@ Keep track of available feats.
 import pygame
 import random
 from pygame.locals import *
-import vista
-import effect
-import settings
-import sprite
+from . import vista
+from . import effect
+from . import settings
+from . import sprite
 
 allfeats = ("nab", "leap", "turn", "twirl", "bound", "dart", "roll")
 

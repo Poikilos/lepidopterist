@@ -5,9 +5,9 @@ import pygame
 import pickle
 # import os
 from pygame.locals import *
-import data
-import vista
-import noise
+from . import data
+from . import vista
+from . import noise
 
 fontcache = {}
 imgcache = {}
@@ -33,7 +33,8 @@ def addcurrency(s):
     '''
     Replace "LLL" in effect string with the pounds sterling symbol.
     '''
-    if "LLL" not in s: return s
+    if "LLL" not in s:
+        return s
     # return s.replace("LLL", "£")    # Uncomment for Windows version
     return str(s).replace("LLL", u"\u00A3")
 
@@ -53,13 +54,15 @@ class Effect(object):
     bratio = 32
     _verbose = False
 
-    def __init__(self, texts, fontsize = None, fontname = None):
+    def __init__(self, texts, fontsize=None, fontname=None):
         self.expiring = self.__class__.expiring
         # self._verbose = self.__class__._verbose
         self.age = 0
 
-        if fontsize is None: fontsize = self.fontsize0
-        if fontname is None: fontname = self.fontname0
+        if fontsize is None:
+            fontsize = self.fontsize0
+        if fontname is None:
+            fontname = self.fontname0
         self.fontsize = fontsize
         self.fontname = fontname
         if self.fontname is None:
@@ -98,11 +101,12 @@ class Effect(object):
 
             def renderlines(color):
                 imgs = [self.font.render(addcurrency(line), True, color) for line in lines]
-                if len(lines) == 1: return imgs[0]
+                if len(lines) == 1:
+                    return imgs[0]
                 w = max(img.get_width() for img in imgs)
                 h = sum(img.get_height() for img in imgs)
-                timg = pygame.Surface((w,h)).convert_alpha()
-                timg.fill((0,0,0,0))
+                timg = pygame.Surface((w, h)).convert_alpha()
+                timg.fill((0, 0, 0, 0))
                 h = 0
                 for img in imgs:
                     r = img.get_rect()
@@ -114,13 +118,16 @@ class Effect(object):
             self.image0 = renderlines(self.color0)
             self.image1 = renderlines(self.color1)
             d = self.fontsize / self.bratio
-            self.image = pygame.Surface((self.image0.get_width() + 2*d, self.image0.get_height() + 2*d)).convert_alpha()
-            self.image.fill((0,0,0,0))
-            self.image.blit(self.image1, (0,0))
-            self.image.blit(self.image1, (0,2*d))
-            self.image.blit(self.image1, (2*d,0))
-            self.image.blit(self.image1, (2*d,2*d))
-            self.image.blit(self.image0, (d,d))
+            self.image = pygame.Surface((
+                self.image0.get_width() + 2*d,
+                self.image0.get_height() + 2*d)
+            ).convert_alpha()
+            self.image.fill((0, 0, 0, 0))
+            self.image.blit(self.image1, (0, 0))
+            self.image.blit(self.image1, (0, 2*d))
+            self.image.blit(self.image1, (2*d, 0))
+            self.image.blit(self.image1, (2*d, 2*d))
+            self.image.blit(self.image0, (d, d))
             imgcache[key] = self.image
         self.rect = self.image.get_rect()
         self.age = 0
@@ -151,13 +158,15 @@ class Effect(object):
     def advance(self):
         self.age -= self.duration(len(self.texts[0]))
         del self.texts[0]
-        if self.texts: self.render()
+        if self.texts:
+            self.render()
 
     def position(self, surf):
         self.rect.center = surf.get_rect().center
 
     def draw(self, surf, center=None):
-        if not self.texts: return
+        if not self.texts:
+            return
         if center is None:
             self.position(surf)
         else:
@@ -218,13 +227,13 @@ class Dialogue(Effect):
 
     def __init__(self, line, who):
         if who == "m":
-            self.color0 = 0,0,128
+            self.color0 = 0, 0, 128
         elif who == "e":
-            self.color0 = 128,128,0
+            self.color0 = 128, 128, 0
         elif who == "s":
-            self.color0 = 64,64,64
+            self.color0 = 64, 64, 64
         elif who == "v":
-            self.color0 = 0,128,0
+            self.color0 = 0, 128, 0
         Effect.__init__(self, [line])
 
     def duration(self, n):
@@ -423,7 +432,7 @@ class CostIndicator(Effect):
     color1 = 0, 0, 0
     bratio = 18
 
-    def __init__(self, cost, n = 0):
+    def __init__(self, cost, n=0):
         Effect.__init__(self, ["LLL%s" % cost if cost else "maxed out"])
         self.n = n
 
@@ -459,7 +468,7 @@ class HCRecord(Effect):
 class BankIndicator(CostIndicator):
     fontsize0 = 40
 
-    def __init__(self, bank, n = 0):
+    def __init__(self, bank, n=0):
         Effect.__init__(self, ["LLL%s" % bank])
         self.n = n
 
@@ -489,7 +498,8 @@ class ComboIndicator(CachedEffect):
 
     def update(self, c):
         text = "%sxCOMBO" % c if c >= 2 else ""
-        if text != self.texts[0]: self.age = 0
+        if text != self.texts[0]:
+            self.age = 0
         CachedEffect.update(self, text)
 
     def position(self, surf):
@@ -510,15 +520,16 @@ class NabBonusIndicator(BonusIndicator):
         self.x0, self.y0 = x0, y0
 
     def draw(self, surf):
-        if not self.texts: return
+        if not self.texts:
+            return
         dx, dy = self.image.get_size()
         vista.blit(self.image, (self.x0 - dx/2, self.y0 + int(self.age*10)))
 
 
 class TouchIndicator(Effect):
     fontsize0 = 28
-    fontname0 = "freesansbold"
-    # fontname0 = "fightingspirit"  # FIXME: why does this fail?
+    # fontname0 = "freesansbold"
+    fontname0 = "fightingspirit"
     expiring = True
     color0 = 255, 255, 255
     color1 = 0, 0, 0
@@ -530,7 +541,8 @@ class TouchIndicator(Effect):
         self.x0, self.y0 = x0, y0
 
     def draw(self, surf):
-        if not self.texts: return
+        if not self.texts:
+            return
         dx, dy = self.image.get_size()
         vista.blit(self.image, (self.x0 - dx/2, self.y0))
 
@@ -589,5 +601,3 @@ class ContinueIndicator(Effect):
 
     def position(self, surf):
         self.rect.topleft = 172, 306
-
-

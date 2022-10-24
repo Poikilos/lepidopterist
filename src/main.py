@@ -9,29 +9,29 @@ import sys
 import os
 from datetime import datetime
 from pygame.locals import *
-import data
-import combo
-import effect
-import vista
-import feat
-import sprite
-import settings
-import record
-import loadlevel
-import noise
-import game
-from effect import is_active
+from . import data  # uh oh! Avoid `import data`, that's something else!
+from . import combo
+from . import effect
+from . import vista
+from . import feat
+from . import sprite
+from . import settings
+from . import record
+from . import loadlevel
+from . import noise
+from . import game
+from .effect import is_active
 import time
-from controls import (
+from .controls import (
     controller1,
     # last_read_actuator_info,
     gamepad_used,
 )
-from pygameinput import(
+from .pygameinput import(
     read_event,
     set_verbose,
 )
-from settings import easy_locked
+from .settings import easy_locked
 
 
 set_verbose(settings.verbose)
@@ -1190,6 +1190,7 @@ def action():
         pcRect.top -= pcRect.height / 2
         '''
         pcInternalRect = sprite.frames[prevPCKey].image.get_rect()
+        screen_size = pygame.display.get_surface().get_size()
         pcRect = vista.get_frame_screen_rect(
             sprite.frames[prevPCKey],
             (x, y),
@@ -1197,7 +1198,8 @@ def action():
             height=pcInternalRect.height/2,
         )
         pcRect.height *= 6
-        # ^ allow clicking below the character for nab
+        # ^ Click anywhere below the character for nab
+        #   (or right-click to do a non-combo jump).
         prevPCKey = picname
 
         for b in butterflies:

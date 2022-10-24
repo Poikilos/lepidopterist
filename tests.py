@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import os
+import sys
 
 from src.controls import controller1
 from src.controller import set_controllers_verbose
@@ -99,7 +100,10 @@ paleRedA128 = (255,53,53,128)
 # flags = pygame.FULLSCREEN
 flags = 0
 screen = pygame.display.set_mode((800, 450), flags)
-while True:
+
+run=True
+
+while run:
     for event in pygame.event.get():
         if event.type == QUIT:
             sys.exit()
@@ -108,6 +112,7 @@ while True:
             pygame.draw.circle(screen, paleRedA128, (x, y), 10)
             # ^ The alpha is copied to the surface, not used.
         pygame.display.flip()
+    run = False
 
 
 print("All tests passed.")

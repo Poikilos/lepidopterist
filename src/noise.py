@@ -3,8 +3,8 @@
 Load and manage sound effects and music.
 '''
 import pygame
-import data
-import settings
+from . import data
+from . import settings
 
 sounds = {}
 songs = {}

@@ -133,4 +133,4 @@ Creative Commons Zero
 * Swoosh is CC-SAMPLING+ by qubodup <http://www.freesound.org/samplesViewSingle.php?id=60009> [new CC0 link](https://freesound.org/people/qubodup/sounds/60009/)
 * Video Game Power Up is [CC0](https://creativecommons.org/publicdomain/zero/1.0/) by AllMusicLibrary: <http://www.allmusiclibrary.com/free_sound_effects.php>
 
-
+* The missing pick.wav and choose.wav were remade using "[Botton Sound pack](https://opengameart.org/content/botton-sound-pack)" by [Listener](https://opengameart.org/users/listener) on [OpenGameArt.org](https://opengameart.org)
