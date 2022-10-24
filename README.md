@@ -1,19 +1,26 @@
 # Mortimer the Lepidopterist
 ![screenshot](screenshot.png)
+
+...a story of rising to the top of ones' "field".
+
+This is fork has for all moves!  It requires Python and Pygame to run until something gets posted on the Releases page. See what else is free and donate at: [zahyest.com](https://zahyest.com).
+
 Mortimer the Lepidopterist by Christopher Night (cosmologicon) Winner (Individual) for Pyweek 2010-08.<br/>
-- Forked by poikilos: <https://github.com/poikilos/lepidopterist>
-  (old versions were uploaded as separate commits)
+- Forked by poikilos: <https://github.com/poikilos/lepidopterist>\
+  (prior versions were uploaded as separate commits)
 
 
 ## Differences in Poikilos' fork
 - Use a game controller (gamepad or joystick; using the MIT Licensed SoftController module: src/controller.py from [github.com/poikilos/SoftController](https://github.com/poikilos/SoftController)).
-  - Key mapping is available, and appear in the help messages.
+  - Key mapping is available and appears in the help messages.
   - The help messages show the button numbers the next time they load after you hit a game controller button.
-- You can do everything using only the mouse.
+- You can do everything using only the mouse (requires some touch-like controls and a scroll wheel). See [mouse controls](#mouse-controls) below.
 - Save the most recent statistics in a machine-readable format.
-  - For running contests, collect and clear it (and savegame.pkl) between players manually or using another script.
-    A score of 100 is good (in about 10 minutes) as a maximum for percentage-based player or team scores if capped at 100.
+  - For running contests:
+    - Collect and clear savegame.pkl between players (manually or using another script).
+    - A score of 100 is good (in about 10 minutes) and can serve as a maximum for percentage-based player or team scores.
 - Save screenshots to the user's Pictures directory (or Pictures/Screenshots if exists).
+
 
 ## Run the game
 python3 run_game.py
@@ -133,4 +140,4 @@ Creative Commons Zero
 * Swoosh is CC-SAMPLING+ by qubodup <http://www.freesound.org/samplesViewSingle.php?id=60009> [new CC0 link](https://freesound.org/people/qubodup/sounds/60009/)
 * Video Game Power Up is [CC0](https://creativecommons.org/publicdomain/zero/1.0/) by AllMusicLibrary: <http://www.allmusiclibrary.com/free_sound_effects.php>
 
-* The missing pick.wav and choose.wav were remade using "[Botton Sound pack](https://opengameart.org/content/botton-sound-pack)" by [Listener](https://opengameart.org/users/listener) on [OpenGameArt.org](https://opengameart.org)
+* The missing pick.wav and choose.wav were remade using "[Botton Sound pack](https://opengameart.org/content/botton-sound-pack)" [sic] by [Listener](https://opengameart.org/users/listener) on [OpenGameArt.org](https://opengameart.org)
